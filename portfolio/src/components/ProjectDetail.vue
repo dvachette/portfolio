@@ -1,0 +1,157 @@
+<script setup lang="ts">
+import type { ProjectModel } from '@/models/ProjectModel'
+import LanguageTag from './LanguageTag.vue'
+import CompetenceCard from './CompetenceCard.vue'
+const { project } = defineProps<{ project: ProjectModel }>()
+const emit = defineEmits(['close'])
+const base = import.meta.env.BASE_URL
+</script>
+<template>
+    <div class="project-detail">
+        <div class="project_detail__header">
+            <h1>{{ project.title }}</h1>
+            <span class="close-button" @click="emit('close')">&Cross;</span>
+        </div>
+        <div class="project_detail__content">
+            <div class="project_detail_content__text">
+                <div class="project_detail__languages">
+                    <LanguageTag
+                        :language="language"
+                        v-for="language in project.programmingLanguages"
+                        :key="language"
+                    />
+                </div>
+                <p>{{ project.description }}</p>
+                <div class="project_detail_content__links">
+                    <a :href="project.sourceCodeLink" target="_blank" v-if="project.sourceCodeLink"
+                        >Voir le code source</a
+                    >
+                    <a :href="project.liveDemoLink" target="_blank" v-if="project.liveDemoLink"
+                        >Voir la démo en ligne</a
+                    >
+                </div>
+            </div>
+
+            <div class="project_detail_content__image">
+                <img :src="`${base}images/${project.image}`" alt="Project image" />
+            </div>
+        </div>
+        <div class="project_detail__competences">
+            <h2>Compétences utilisées</h2>
+            <CompetenceCard
+                v-for="competence in project.competences"
+                :key="competence.name"
+                :competence="competence"
+            />
+        </div>
+    </div>
+</template>
+<style scoped>
+.project-detail {
+    border: none;
+    border-radius: 8px;
+    background-color: #555;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    margin-top: 2em;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70vw;
+    height: 70vh;
+    overflow: scroll;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    box-shadow: 0px 0px 8px rgba(175, 175, 175, 0.411);
+    transition: all 0.3s ease;
+}
+.project-detail::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+}
+.project-detail:hover {
+    box-shadow: 0px 0px 18px rgba(175, 175, 175, 0.8);
+}
+.project_detail__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: sticky;
+    top: 0;
+    background-color: #333;
+    margin: 0;
+    width: 100%;
+    z-index: 10;
+}
+.close-button {
+    font-size: 2em;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ff0000;
+    position: relative;
+    top: 0;
+    right: 1%;
+    transition: font-size 0.3s ease;
+}
+.close-button:hover {
+    font-size: 2.4em;
+}
+h1 {
+    font-size: 2em;
+    color: #eee;
+    margin: 0;
+    padding: 0.5em;
+}
+.project_detail__content {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding: 1em;
+}
+.project_detail_content__text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: 1.1em;
+    gap: 0.5em;
+    color: #ddd;
+}
+.project_detail_content__image {
+    width: 40%;
+    height: fit-content;
+    overflow: hidden;
+    border-radius: 8px;
+}
+.project_detail_content__image img {
+    width: 90%;
+    height: 50%;
+    object-fit: cover;
+    object-position: center;
+}
+.project_detail__competences {
+    padding: 1em;
+}
+.project_detail__competences h2 {
+    font-size: 1.5em;
+    color: #eee;
+    margin-bottom: 0.5em;
+}
+.project_detail__languages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-bottom: 1em;
+}
+.project_detail_content__links {
+    display: flex;
+    gap: 1em;
+    margin-top: 1em;
+}
+.project_detail_content__links a {
+    color: #42b883;
+    text-decoration: none;
+    font-weight: bold;
+}
+.project_detail_content__links a:hover {
+    text-decoration: underline;
+}
+</style>

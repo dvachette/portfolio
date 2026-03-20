@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import CompetenceLevel from './CompetenceLevel.vue'
-interface Props {
-    name: string
-    description: string
-    level: 'acquired' | 'acquiring' | 'not acquired'
-}
-const { name, description, level } = defineProps<Props>()
+import type { CompetenceModel } from '@/models/CompetenceModel'
+const { competence } = defineProps<{ competence: CompetenceModel }>()
 </script>
 
 <template>
     <div class="competence_card">
         <div class="competence_card__header">
-            <CompetenceLevel :level="level" />
-            <h3 class="competence_card__name">{{ name }}</h3>
+            <CompetenceLevel :level="competence.level" />
+            <h3 class="competence_card__name">{{ competence.name }}</h3>
         </div>
-        <p class="competence_card__description">{{ description }}</p>
+        <p class="competence_card__description">{{ competence.description }}</p>
     </div>
 </template>
 <style scoped>
@@ -39,10 +35,6 @@ const { name, description, level } = defineProps<Props>()
     display: flex;
     align-items: center;
 }
-.competence_card:hover {
-    transform: scale(1.03);
-    background-color: #444;
-}
 .competence_card__name {
     font-size: 1.5em;
     font-weight: bold;
@@ -53,5 +45,12 @@ const { name, description, level } = defineProps<Props>()
     font-size: 1em;
     color: #aaa;
     margin-top: 10px;
+}
+/* Hover effect for larger screens */
+@media (min-width: 600px) {
+    .competence_card:hover {
+        transform: scale(1.03);
+        background-color: #444;
+    }
 }
 </style>
