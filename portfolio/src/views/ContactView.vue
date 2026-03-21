@@ -8,6 +8,7 @@
             >Mon LinkedIn</a
         >
         <a class="btn" target="blank" href="https://www.github.com/dvachette">Mon GitHub</a>
+        <a class="btn" target="_blank" href="/cv_donatien_vachette_21-03-2026-latest.pdf">Mon CV</a>
     </div>
 </template>
 <style scoped>

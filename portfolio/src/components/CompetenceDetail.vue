@@ -117,8 +117,10 @@ h2 {
     margin: 20px;
 }
 .competence_detail__projects {
-    list-style: none;
-    padding: 0 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
 }
 .competence_detail__projects li {
     margin: 10px 0;

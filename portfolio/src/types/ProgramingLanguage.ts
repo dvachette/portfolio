@@ -13,3 +13,5 @@ export type ProgrammingLanguage =
     | 'React'
     | 'Angular'
     | 'Bash'
+    | 'HTML/CSS'
+    | 'SQL'

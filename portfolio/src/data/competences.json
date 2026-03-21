@@ -2,31 +2,85 @@
     {
         "id": "python",
         "name": "Python",
-        "description": "Description of Python competence",
+        "description": "Python est un langage de programmation polyvalent et facile à apprendre, utilisé pour le développement web, l'analyse de données, l'intelligence artificielle, le développement de logiciels, et bien plus encore. Il est apprécié pour sa syntaxe claire et concise, ainsi que pour sa vaste bibliothèque standard qui facilite la réalisation de nombreuses tâches courantes.",
         "level": "acquired"
     },
     {
         "id": "javascript",
         "name": "JavaScript",
-        "description": "Description of JavaScript competence",
-        "level": "not_acquired"
+        "description": "JavaScript est un langage de programmation principalement utilisé pour créer des interactions dynamiques sur les sites web. Il permet de manipuler le contenu d'une page web, de gérer les événements utilisateur, et de communiquer avec des serveurs pour charger ou envoyer des données sans recharger la page. JavaScript est un élément clé du développement web moderne, souvent utilisé en combinaison avec HTML et CSS.",
+        "level": "acquired"
     },
     {
         "id": "c",
         "name": "C",
-        "description": "Description of C competence",
+        "description": "C est un langage de programmation haut niveau qui offre un contrôle précis sur les ressources matérielles. Il est largement utilisé pour le développement de systèmes d'exploitation, de logiciels embarqués, et d'applications nécessitant des performances élevées. C est également un langage de choix pour l'apprentissage de la programmation en raison de sa simplicité et de sa proximité avec le matériel. C'est également mon langage de programmation préféré.",
         "level": "acquired"
     },
     {
         "id": "cpp",
         "name": "C++",
-        "description": "Description of C++ competence",
+        "description": "C++ est un langage de programmation orienté objet qui étend les fonctionnalités du langage C. Il est utilisé pour le développement de logiciels complexes, de jeux vidéo, d'applications graphiques, et de systèmes d'exploitation. C++ offre des fonctionnalités avancées telles que la gestion de la mémoire, les classes, et les templates, ce qui en fait un choix populaire pour les projets nécessitant des performances élevées et une grande flexibilité.",
         "level": "acquiring"
     },
     {
-        "id": "dummy",
-        "name": "Dummy Competence",
-        "description": "This is a dummy competence used for testing purposes. It does not represent any real skill or knowledge, but serves as a placeholder to demonstrate how competences are structured and displayed in the portfolio.",
+        "id": "vuejs",
+        "name": "Vue.js",
+        "description": "Vue.js est un framework JavaScript progressif utilisé pour construire des interfaces utilisateur. Il est conçu pour être facile à intégrer dans des projets existants et offre une approche déclarative pour la création de composants réutilisables. Vue.js est apprécié pour sa simplicité, sa flexibilité, et sa performance, ce qui en fait un choix populaire pour le développement de applications web modernes.",
+        "level": "acquiring"
+    },
+    {
+        "id": "typescript",
+        "name": "TypeScript",
+        "description": "TypeScript est un langage de programmation développé par Microsoft qui est un sur-ensemble de JavaScript. Il ajoute des fonctionnalités de typage statique et de vérification de type à JavaScript, ce qui permet aux développeurs de détecter les erreurs de type lors de la compilation plutôt qu'à l'exécution. TypeScript est largement utilisé dans le développement web moderne, en particulier avec des frameworks comme Angular et Vue.js, pour améliorer la maintenabilité et la robustesse du code.",
+        "level": "acquiring"
+    },
+    {
+        "id": "sql",
+        "name": "SQL",
+        "description": "SQL (Structured Query Language) est un langage de programmation utilisé pour gérer et manipuler des bases de données relationnelles. Il permet aux utilisateurs de créer, lire, mettre à jour et supprimer des données dans une base de données. SQL est essentiel pour les développeurs et les analystes de données qui travaillent avec des systèmes de gestion de bases de données tels que MySQL, PostgreSQL, et Microsoft SQL Server.",
+        "level": "acquired"
+    },
+    {
+        "id": "git",
+        "name": "Git",
+        "description": "Git est un système de contrôle de version distribué utilisé pour suivre les modifications apportées au code source lors du développement de logiciels. Il permet aux développeurs de collaborer efficacement en gérant les différentes versions du code, en facilitant la fusion des modifications, et en offrant des fonctionnalités telles que les branches et les commits. Git est largement utilisé dans l'industrie du développement logiciel pour assurer une gestion efficace du code et une collaboration fluide entre les équipes.",
+        "level": "acquired"
+    },
+    {
+        "id": "docker",
+        "name": "Docker",
+        "description": "Docker est une plateforme de conteneurisation qui permet aux développeurs de créer, déployer et exécuter des applications dans des conteneurs légers et portables. Les conteneurs Docker encapsulent une application et toutes ses dépendances, ce qui garantit que l'application fonctionne de manière cohérente dans différents environnements. Docker est largement utilisé pour simplifier le développement, le déploiement et la gestion des applications, en particulier dans les environnements de cloud computing.",
+        "level": "acquiring"
+    },
+    {
+        "id": "linux",
+        "name": "Linux",
+        "description": "Linux est un système d'exploitation open source basé sur le noyau Linux. Il est largement utilisé dans les serveurs, les systèmes embarqués, et les ordinateurs de bureau. Linux offre une grande flexibilité, une sécurité renforcée, et une vaste communauté de développeurs qui contribuent à son développement continu. Les compétences en Linux sont essentielles pour les administrateurs système, les développeurs, et les professionnels de l'informatique qui travaillent avec des environnements basés sur Linux.",
+        "level": "acquired"
+    },
+    {
+        "id": "html_css",
+        "name": "HTML & CSS",
+        "description": "HTML (HyperText Markup Language) et CSS (Cascading Style Sheets) sont les technologies de base utilisées pour créer et styliser des pages web. HTML fournit la structure du contenu d'une page web, tandis que CSS est utilisé pour définir l'apparence visuelle de ce contenu. Ensemble, HTML et CSS permettent aux développeurs de créer des sites web attrayants et fonctionnels, en contrôlant la mise en page, les couleurs, les polices, et d'autres aspects du design web.",
+        "level": "acquired"
+    },
+    {
+        "id": "java",
+        "name": "Java",
+        "description": "Java est un langage de programmation orienté objet largement utilisé pour le développement d'applications d'entreprise, de logiciels mobiles, et de systèmes embarqués. Il est connu pour sa portabilité grâce à la machine virtuelle Java (JVM), qui permet aux applications Java de s'exécuter sur différentes plateformes sans modification du code source. Java est également apprécié pour sa robustesse, sa sécurité, et sa vaste bibliothèque standard qui facilite le développement de diverses applications.",
+        "level": "acquiring"
+    },
+    {
+        "id": "agile",
+        "name": "Agile",
+        "description": "Agile est une méthodologie de gestion de projet et de développement logiciel qui met l'accent sur la collaboration, la flexibilité, et la livraison rapide de produits fonctionnels. Les équipes Agile travaillent en itérations courtes, appelées sprints, pour développer des fonctionnalités spécifiques, tout en restant ouvertes aux changements et aux ajustements en cours de projet. Agile favorise la communication constante entre les membres de l'équipe et les parties prenantes, ce qui permet de répondre rapidement aux besoins changeants et d'améliorer continuellement le produit final.",
+        "level": "acquiring"
+    },
+    {
+        "id": "cobol",
+        "name": "COBOL",
+        "description": "COBOL (Common Business Oriented Language) est un langage de programmation de haut niveau conçu pour les applications commerciales. Il a été développé dans les années 1950 et est encore largement utilisé aujourd'hui dans les systèmes bancaires, les assurances, et d'autres secteurs qui nécessitent une gestion robuste des données et des transactions. COBOL est connu pour sa syntaxe claire et lisible, ce qui facilite la maintenance des applications à long terme. Bien que considéré comme un langage plus ancien, COBOL continue d'être essentiel pour de nombreuses entreprises qui dépendent de systèmes hérités pour leurs opérations quotidiennes.",
         "level": "not_acquired"
     }
 ]

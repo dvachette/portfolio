@@ -8,6 +8,9 @@ if (classLanguage === 'c#') {
 if (classLanguage === 'c++') {
     classLanguage = 'cpp'
 }
+if (classLanguage === 'html/css') {
+    classLanguage = 'html_css'
+}
 </script>
 <template>
     <div :class="['language-tag', `language-tag--${classLanguage}`]">
@@ -31,6 +34,7 @@ export type ProgrammingLanguage =
     | 'React'
     | 'Angular'
     | 'Bash'
+    | 'HTML/CSS'
 
 */
 .language-tag {
@@ -98,5 +102,13 @@ export type ProgrammingLanguage =
 .language-tag--bash {
     background-color: #89e05180;
     border: #89e051 solid 3px;
+}
+.language-tag--html_css {
+    background-color: #e34c2680;
+    border: #e34c26 solid 3px;
+}
+.language-tag--sql {
+    background-color: #e38c0080;
+    border: #e38c00 solid 3px;
 }
 </style>
