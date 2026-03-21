@@ -8,6 +8,7 @@
             >
             <RouterLink active-class="nav-active" :to="{ name: 'projects' }">Projects</RouterLink>
             <RouterLink active-class="nav-active" :to="{ name: 'contact' }">Contact</RouterLink>
+            <RouterLink active-class="nav-active" :to="{ name: 'credits' }">Crédits</RouterLink>
         </nav>
     </header>
 </template>

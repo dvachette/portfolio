@@ -1,27 +1,20 @@
 <script setup lang="ts">
-import type { CompetenceModel } from '@/models/CompetenceModel'
 import CompetenceLevel from './CompetenceLevel.vue'
-const { competence } = defineProps<{
-    competence: CompetenceModel
-}>()
+import type { CompetenceModel } from '@/models/CompetenceModel'
+const { competence } = defineProps<{ competence: CompetenceModel }>()
 const emit = defineEmits(['select'])
 function selectCompetence() {
     emit('select', competence)
 }
 </script>
+
 <template>
     <div class="competence_card" @click="selectCompetence">
         <div class="competence_card__header">
             <CompetenceLevel :level="competence.level" />
             <h3 class="competence_card__name">{{ competence.name }}</h3>
         </div>
-        <p class="competence_card__description">
-            {{
-                competence.description.length > 100
-                    ? competence.description.substring(0, 100) + '...'
-                    : competence.description
-            }}
-        </p>
+        <p class="competence_card__description">{{ competence.description }}</p>
     </div>
 </template>
 <style scoped>
@@ -33,15 +26,15 @@ function selectCompetence() {
     There should be some hover effect on the card, such as a slight increase in size and a change in background color. The card should be responsive and look good on different screen sizes.
  */
 .competence_card {
-    background-color: #3338;
+    background-color: #333;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 0 20px 20px 20px;
+    margin: 3%;
     transition:
         transform 0.2s,
         background-color 0.2s;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    max-width: 300px;
 }
 .competence_card__header {
     display: flex;
@@ -57,24 +50,12 @@ function selectCompetence() {
     font-size: 1em;
     color: #aaa;
     margin-top: 10px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-weight: bold;
-} /* Hover effect for larger screens */
+}
+/* Hover effect for larger screens */
 @media (min-width: 600px) {
     .competence_card:hover {
         transform: scale(1.03);
-        background-color: #4448;
-    }
-}
-/* Fixed size and no hover effect for smaller screens */
-@media (max-width: 600px) {
-    .competence_card {
-        width: 95%;
-        max-width: none;
-    }
-    .competence_card:hover {
-        transform: none;
-        background-color: #3338;
+        background-color: #444;
     }
 }
 </style>

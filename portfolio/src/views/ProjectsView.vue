@@ -3,28 +3,16 @@ import { useProjectService } from '@/services/ProjectService'
 import { ref } from 'vue'
 import type { ProjectModel } from '@/models/ProjectModel'
 import ProjectCard from '@/components/ProjectCard.vue'
-import ProjectDetail from '@/components/ProjectDetail.vue'
+import { useRouter } from 'vue-router'
 
 const projectService = useProjectService()
 const projects = ref<ProjectModel[]>([])
-const selectedProject = ref<ProjectModel | null>(null)
-
+const router = useRouter()
 projects.value = projectService.getProjectTab()
 
 function selectProject(project: ProjectModel) {
-    selectedProject.value = project
+    router.push({ path: `/projects/${project.id}` })
 }
-
-function unselectProject() {
-    selectedProject.value = null
-}
-
-// Handle escape key to close the project detail
-window.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        unselectProject()
-    }
-})
 </script>
 <template>
     <h1>Mes projets</h1>
@@ -36,7 +24,7 @@ window.addEventListener('keydown', (event) => {
             @select="selectProject"
         />
     </div>
-    <ProjectDetail v-if="selectedProject" :project="selectedProject" @close="unselectProject" />
+    <RouterView />
 </template>
 <style scoped>
 .projects-list {
@@ -46,9 +34,11 @@ window.addEventListener('keydown', (event) => {
     gap: 1em;
 }
 h1 {
-    font-size: 2.3em;
+    font-size: 2.5em;
     color: #eee;
-    font-family: monospace;
+    font-weight: bold;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    cursor: default;
 }
 @media (max-width: 600px) {
     .projects-list {

@@ -1,42 +1,22 @@
 [
     {
+        "id": "project1",
         "title": "Project 1",
         "description": "Description of project 1",
         "image": "project1.png",
         "sourceCodeLink": "https://github.com",
         "liveDemoLink": "https://example.com",
-        "competences": [
-            {
-                "name": "C",
-                "description": "Description of C competence",
-                "level": "acquired"
-            },
-            {
-                "name": "C++",
-                "description": "Description of C++ competence",
-                "level": "acquiring"
-            }
-        ],
+        "competences": ["c", "cpp"],
         "programmingLanguages": ["C", "C++"]
     },
     {
+        "id": "project2",
         "title": "Project 2",
         "description": "Description of project 2. I need to write a longer description to test the layout of the project card component. This description should be long enough to see how the text wraps and how it affects the overall design of the card.",
         "image": "project1.png",
         "sourceCodeLink": "https://github.com",
         "liveDemoLink": "https://example.com",
-        "competences": [
-            {
-                "name": "Python",
-                "description": "Description of Python competence",
-                "level": "acquired"
-            },
-            {
-                "name": "JavaScript",
-                "description": "Description of JavaScript competence",
-                "level": "not_acquired"
-            }
-        ],
+        "competences": ["python", "javascript"],
         "programmingLanguages": ["Python", "JavaScript"]
     }
 ]

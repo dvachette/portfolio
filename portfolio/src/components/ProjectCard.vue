@@ -37,7 +37,7 @@ const emit = defineEmits(['select'])
     padding: 1em;
     border-radius: 8px;
     cursor: pointer;
-    background-color: #333;
+    background-color: #333c;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     max-width: 500px;
     transition:
@@ -74,7 +74,7 @@ div.project_card__text h2 {
 }
 .project_card:hover {
     transform: scale(1.03);
-    background-color: #444;
+    background-color: #444c;
 }
 
 @media (max-width: 600px) {

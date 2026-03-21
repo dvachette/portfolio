@@ -1,16 +1,44 @@
 <script setup lang="ts">
 import type { ProjectModel } from '@/models/ProjectModel'
 import LanguageTag from './LanguageTag.vue'
-import CompetenceCard from './CompetenceCard.vue'
-const { project } = defineProps<{ project: ProjectModel }>()
-const emit = defineEmits(['close'])
+import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
+import { useRouter } from 'vue-router'
+import { useProjectService } from '@/services/ProjectService'
+import { ref, watch } from 'vue'
+import type { CompetenceModel } from '@/models/CompetenceModel'
+
+const router = useRouter()
+const projectService = useProjectService()
+const projectId = ref(router.currentRoute.value.params.id as string)
+
+console.log('Project ID from route:', projectId)
+const project = ref<ProjectModel>(projectService.getProjectById(projectId.value))
+console.log('Fetched project:', project.value)
+
 const base = import.meta.env.BASE_URL
+
+function closeDetail() {
+    router.push({ name: 'projects' })
+}
+function goToCompetence(competence: CompetenceModel) {
+    router.push({ name: 'competence-details', params: { id: competence.id } })
+}
+
+watch(
+    () => router.currentRoute.value.params.id,
+    (newId) => {
+        projectId.value = newId as string
+        project.value = projectService.getProjectById(projectId.value)
+        console.log('Route changed, new project ID:', projectId.value)
+        console.log('Fetched new project:', project.value)
+    },
+)
 </script>
 <template>
     <div class="project-detail">
         <div class="project_detail__header">
             <h1>{{ project.title }}</h1>
-            <span class="close-button" @click="emit('close')">&Cross;</span>
+            <span class="close-button" @click="closeDetail">&Cross;</span>
         </div>
         <div class="project_detail__content">
             <div class="project_detail_content__text">
@@ -36,12 +64,16 @@ const base = import.meta.env.BASE_URL
                 <img :src="`${base}images/${project.image}`" alt="Project image" />
             </div>
         </div>
-        <div class="project_detail__competences">
+        <div
+            class="project_detail__competences"
+            v-if="project.competences && project.competences.length > 0"
+        >
             <h2>Compétences utilisées</h2>
-            <CompetenceCard
+            <ProjectCompetenceCard
                 v-for="competence in project.competences"
-                :key="competence.name"
+                :key="competence.id"
                 :competence="competence"
+                @select="goToCompetence"
             />
         </div>
     </div>
@@ -50,7 +82,7 @@ const base = import.meta.env.BASE_URL
 .project-detail {
     border: none;
     border-radius: 8px;
-    background-color: #555;
+    background-color: #444757;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     margin-top: 2em;
     position: fixed;

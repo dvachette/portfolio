@@ -1,0 +1,32 @@
+[
+    {
+        "id": "python",
+        "name": "Python",
+        "description": "Description of Python competence",
+        "level": "acquired"
+    },
+    {
+        "id": "javascript",
+        "name": "JavaScript",
+        "description": "Description of JavaScript competence",
+        "level": "not_acquired"
+    },
+    {
+        "id": "c",
+        "name": "C",
+        "description": "Description of C competence",
+        "level": "acquired"
+    },
+    {
+        "id": "cpp",
+        "name": "C++",
+        "description": "Description of C++ competence",
+        "level": "acquiring"
+    },
+    {
+        "id": "dummy",
+        "name": "Dummy Competence",
+        "description": "This is a dummy competence used for testing purposes. It does not represent any real skill or knowledge, but serves as a placeholder to demonstrate how competences are structured and displayed in the portfolio.",
+        "level": "not_acquired"
+    }
+]
