@@ -3,10 +3,11 @@
     <header>
         <nav>
             <RouterLink active-class="nav-active" :to="{ name: 'home' }">Accueil</RouterLink>
+            <RouterLink active-class="nav-active" :to="{ name: 'me' }">À propos de moi</RouterLink>
             <RouterLink active-class="nav-active" :to="{ name: 'competences' }"
                 >Compétences</RouterLink
             >
-            <RouterLink active-class="nav-active" :to="{ name: 'projects' }">Projects</RouterLink>
+            <RouterLink active-class="nav-active" :to="{ name: 'projects' }">Projets</RouterLink>
             <RouterLink active-class="nav-active" :to="{ name: 'contact' }">Contact</RouterLink>
             <RouterLink active-class="nav-active" :to="{ name: 'credits' }">Crédits</RouterLink>
         </nav>

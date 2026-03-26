@@ -6,6 +6,8 @@ import ContactView from '@/views/ContactView.vue'
 import ProjectDetails from '@/components/ProjectDetail.vue'
 import CreditsView from '@/views/CreditsView.vue'
 import CompetenceDetail from '@/components/CompetenceDetail.vue'
+import MeView from '@/views/MeView.vue'
+
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
@@ -49,6 +51,11 @@ const router = createRouter({
             path: '/credits',
             name: 'credits',
             component: CreditsView,
+        },
+        {
+            path: '/me',
+            name: 'me',
+            component: MeView,
         },
     ],
 })

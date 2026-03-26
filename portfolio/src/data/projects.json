@@ -5,45 +5,7 @@
         "description": "BDE INFO TCG est un jeu de cartes à collectionner développé dans le cadre d'un projet universitaire. Les cartes représentent des membres actuels ou anciens du Bureau Des Etudiants de l'IUT Informatique de la Doua. Le jeu offre des mecanismes de combat en temps réel, des ouvertures de booster, un magasin, et un système de collection. Les joueurs peuvent construire leur deck en choisissant parmi une variété de cartes, chacune ayant des compétences et des caractéristiques uniques. ",
         "image": "bdeinfo-tcg.png",
         "liveDemoLink": "https://bdeinfo-tcg.dvachette.fr",
-        "competences": ["vuejs", "javascript", "docker", "git", "sql"],
+        "competences": [],
         "programmingLanguages": ["JavaScript", "Vue", "SQL"]
-    },
-    {
-        "id": "jsnake",
-        "title": "JSnake",
-        "description": "JSnake est un jeu de snake développé en JavaScript, pour mettre en pratique les cours de développement JavaScript que j'ai suivis. Le jeu propose une expérience de jeu classique de snake, où le joueur contrôle un serpent qui grandit en mangeant des pommes tout en évitant de se mordre la queue ou de heurter les murs. C'est un projet personnel qui m'a permis d'approfondir mes compétences en JavaScript et en développement de jeux web.",
-        "image": "jsnake.png",
-        "sourceCodeLink": "https://github.com/dvachette/jsnake",
-        "liveDemoLink": "https://jsnake-dvachette.vercel.app/",
-        "competences": ["html_css", "javascript"],
-        "programmingLanguages": ["HTML/CSS", "JavaScript"]
-    },
-    {
-        "id": "unixpy",
-        "title": "Unyx",
-        "description": "Unyx est un projet de simulateur de console Unix développé en Python. L'objectif de ce projet était de créer une interface de ligne de commande qui imite le comportement d'une console Unix, permettant aux utilisateurs d'exécuter des commandes, de naviguer dans le système de fichiers, et offre une API pour facilement utiliser un sous système Unyx dans d'autres projets Python. Unyx est conçu pour être extensible, permettant aux développeurs d'ajouter de nouvelles commandes et fonctionnalités selon leurs besoins.",
-        "image": "unyx.png",
-        "sourceCodeLink": "https://github.com/dvachette/unixpy",
-        "competences": ["python", "linux"],
-        "programmingLanguages": ["Python"]
-    },
-    {
-        "id": "sae-c-but1",
-        "title": "SAE C BUT1",
-        "description": "SAE C BUT1 est un projet universitaire réalisé dans le cadre du BUT Informatique. Le projet consistait à développer une application en C qui implémente un système de gestion d'annuaire. L'application permet aux utilisateurs de créer, lire, mettre à jour et supprimer des entrées dans l'annuaire, ainsi que de rechercher des contacts par différents critères. Ce projet m'a permis de renforcer mes compétences en programmation C, en gestion de la mémoire, et en conception de structures de données efficaces.",
-        "image": "sae_c_but1.png",
-        "sourceCodeLink": "https://github.com/dvachette/SAE_c_BUT1",
-        "competences": ["c", "git", "linux"],
-        "programmingLanguages": ["C"]
-    },
-    {
-        "id": "portfolio",
-        "title": "Portfolio Personnel",
-        "description": "Ce portfolio personnel a été développé pour présenter mes compétences, mes projets, et mon parcours professionnel de manière interactive et visuellement attrayante. Il a été construit en utilisant Vue.js pour la partie frontend, avec une attention particulière portée à l'expérience utilisateur et au design. Le portfolio inclut des sections détaillées sur mes compétences techniques et mes projets réalisés. Il est hébergé sur un serveur Apache, avec une configuration Docker pour faciliter le déploiement et la gestion de l'application. Ce projet m'a permis de mettre en pratique mes compétences en développement web, en design d'interface utilisateur, et en gestion d'infrastructure de déploiement.",
-        "image": "portfolio.png",
-        "sourceCodeLink": "https://github.com/dvachette/portfolio",
-        "liveDemoLink": "https://www.dvachette.fr",
-        "competences": ["vuejs", "typescript", "docker", "git", "linux"],
-        "programmingLanguages": ["TypeScript", "Vue"]
     }
 ]
