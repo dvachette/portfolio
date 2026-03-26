@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-interface Props {
-    level: 'acquired' | 'acquiring' | 'not_acquired'
+interface CompetenceLevelProps {
+    level: number,
+    max: number
+    
 }
-const { level } = defineProps<Props>()
+const { level, max } = defineProps<CompetenceLevelProps>()
 const isPopupVisible = ref(false)
 function showPopup() {
     isPopupVisible.value = true
@@ -14,12 +16,12 @@ function hidePopup() {
 </script>
 <template>
     <div class="competence" @mouseover="showPopup" @click="showPopup">
-        <div class="competence_level" :class="`competence_level--${level}`"></div>
+        <div class="competence_level" :class="`competence_level--${max - level}`"></div>
     </div>
     <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
-        <p v-if="level === 'acquired'">Cette compétence est acquise.</p>
-        <p v-else-if="level === 'acquiring'">Cette compétence est en cours d'acquisition.</p>
-        <p v-else>Cette compétence n'est pas encore acquise.</p>
+        <p v-if="level === 1">Niveau 1</p>
+        <p v-else-if="level === 2">Niveau 2</p>
+        <p v-else>Niveau 3</p>
     </div>
 </template>
 <style scoped>
@@ -50,13 +52,13 @@ function hidePopup() {
     height: 20px;
     border-radius: 50%;
 }
-.competence_level--acquired {
+.competence_level--0 {
     background-color: rgb(59, 197, 4);
 }
-.competence_level--acquiring {
-    background-color: orange;
+.competence_level--1 {
+    background-color: yellow;
 }
-.competence_level--not_acquired {
-    background-color: red;
+.competence_level--2 {
+    background-color: orange;
 }
 </style>

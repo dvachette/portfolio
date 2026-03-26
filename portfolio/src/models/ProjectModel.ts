@@ -1,4 +1,4 @@
-import type { CompetenceModel } from '@/models/CompetenceModel'
+import type { UEModel } from '@/models/UEModel'
 import type { ProgrammingLanguage } from '@/types/ProgramingLanguage'
 export interface ProjectModel {
     id: string
@@ -7,6 +7,6 @@ export interface ProjectModel {
     image: string
     sourceCodeLink?: string
     liveDemoLink?: string
-    competences: CompetenceModel[]
+    competences: UEModel[]
     programmingLanguages: ProgrammingLanguage[]
 }

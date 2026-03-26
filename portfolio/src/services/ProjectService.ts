@@ -1,13 +1,13 @@
 import projects from '@/data/projects.json'
 import type { ProjectModel } from '@/models/ProjectModel'
-import { useCompetenceService } from './CompetenceService'
-const competenceService = useCompetenceService()
+import { useUEService } from './UEService'
+const ueService = useUEService()
 function getProjectTab(): ProjectModel[] {
     // Replace the id's in the projects with the actual competence objects
 
     const projectsTab = projects.map((project) => {
         const projectCompetences = project.competences.map((competenceId) => {
-            const competence = competenceService.getCompetenceById(competenceId)
+            const competence = ueService.getUEById(competenceId)
             if (competence.id === 'not-found') {
                 console.warn(
                     `Competence with id ${competenceId} not found for project ${project.id}.`,

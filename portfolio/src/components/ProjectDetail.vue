@@ -5,7 +5,7 @@ import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
 import { useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
 import { ref, watch } from 'vue'
-import type { CompetenceModel } from '@/models/CompetenceModel'
+import type { UEModel } from '@/models/UEModel'
 
 const router = useRouter()
 const projectService = useProjectService()
@@ -20,7 +20,7 @@ const base = import.meta.env.BASE_URL
 function closeDetail() {
     router.push({ name: 'projects' })
 }
-function goToCompetence(competence: CompetenceModel) {
+function goToCompetence(competence: UEModel) {
     router.push({ name: 'competence-details', params: { id: competence.id } })
 }
 

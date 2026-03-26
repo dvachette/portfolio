@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
-import { useCompetenceService } from '@/services/CompetenceService'
+import { useUEService } from '@/services/UEService'
 import CompetenceLevel from './CompetenceLevel.vue'
 import { useProjectService } from '@/services/ProjectService'
 import ProjectCard from './ProjectCard.vue'
 const router = useRouter()
 const route = useRoute()
-const competenceService = useCompetenceService()
+const ueService = useUEService()
 const projectService = useProjectService()
 const competenceId = ref(route.params.id)
 
-const competence = ref(competenceService.getCompetenceById(competenceId.value as string))
+const competence = ref(ueService.getUEById(competenceId.value as string))
 const projects = ref(projectService.getProjectsByCompetenceId(competenceId.value as string))
 watch(
     () => route.params.id,
     (newId) => {
         competenceId.value = newId as string
-        competence.value = competenceService.getCompetenceById(competenceId.value)
+        competence.value = ueService.getUEById(competenceId.value)
         projects.value = projectService.getProjectsByCompetenceId(competenceId.value)
     },
 )
@@ -29,7 +29,7 @@ function goBack() {
     <div class="competence_detail">
         <div class="competence_detail__header">
             <div class="competence_level_container">
-                <CompetenceLevel :level="competence.level" class="competence_level" />
+                <CompetenceLevel :level="competence.level" :max="competence.levels.length" class="competence_level" />
                 <h1 class="competence_detail__name">{{ competence.name }}</h1>
             </div>
             <span class="close-button" @click="goBack">&Cross;</span>

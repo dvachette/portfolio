@@ -1,28 +1,31 @@
-import type { CompetenceModel } from '@/models/CompetenceModel'
+import type { UEModel } from '@/models/UEModel'
 import type { ProjectModel } from '@/models/ProjectModel'
-import data from '@/data/competences.json'
+import data from '@/data/UEs.json'
 
-const competences = data as CompetenceModel[]
-function getCompetencesTab(): CompetenceModel[] {
+const competences = data as UEModel[]
+
+function getUEsTab(): UEModel[] {
     return competences
 }
 
-function getCompetenceById(id: string): CompetenceModel {
+function getUEById(id: string): UEModel {
     let ret = competences.find((competence) => competence.id === id)
     if (!ret) {
         ret = {
             id: 'not-found',
             name: 'Compétence non trouvée',
             description: "La compétence demandée n'a pas été trouvée.",
-            level: 'acquiring',
+            level: 3,
+            levels: [],
+            details: [],
         }
     }
     return ret
 }
 
-export function useCompetenceService() {
+export function useUEService() {
     return {
-        getCompetencesTab,
-        getCompetenceById,
+        getUEsTab,
+        getUEById,
     }
 }

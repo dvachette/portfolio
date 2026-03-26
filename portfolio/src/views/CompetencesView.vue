@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
-import type { CompetenceModel } from '@/models/CompetenceModel'
-import { useCompetenceService } from '@/services/CompetenceService'
+import type { UEModel } from '@/models/UEModel'
+import { useUEService } from '@/services/UEService'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const competenceService = useCompetenceService()
-const competences = ref(competenceService.getCompetencesTab())
+const ueService = useUEService()
+const competences = ref(ueService.getUEsTab())
 
-const openDetail = (competence: CompetenceModel) => {
+const openDetail = (competence: UEModel) => {
     console.log('Selected competence:', competence)
     router.push(`/competences/${competence.id}`)
 }
