@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ProjectModel } from '@/models/ProjectModel'
 import LanguageTag from './LanguageTag.vue'
+import ProjectTypeLabel from './ProjectTypeLabel.vue'
 const base = import.meta.env.BASE_URL
 const { project } = defineProps<{ project: ProjectModel }>()
 const emit = defineEmits(['select'])
@@ -8,7 +9,10 @@ const emit = defineEmits(['select'])
 <template>
     <div class="project_card" @click="emit('select', project)">
         <div class="project_card__text">
-            <h2>{{ project.title }}</h2>
+            <div class="project_card__header">
+                <ProjectTypeLabel :projectType="project.projectType" />
+                <h2>{{ project.title }}</h2>
+            </div>
             <div class="languages">
                 <LanguageTag
                     :language="language"
@@ -47,6 +51,11 @@ const emit = defineEmits(['select'])
 div.project_card__text h2 {
     margin: 0;
     color: #eee;
+}
+.project_card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
 }
 .project_card__text {
     flex: 1;

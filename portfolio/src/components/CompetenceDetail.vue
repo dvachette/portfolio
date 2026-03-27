@@ -110,6 +110,17 @@ onUnmounted(() => {
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     box-shadow: 0px 0px 8px rgba(175, 175, 175, 0.411);
     transition: all 0.3s ease;
+    animation: zoomAtOpen 0.3s ease;
+}
+@keyframes zoomAtOpen {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
 }
 .competence_detail::-webkit-scrollbar {
     display: none; /* Safari and Chrome */

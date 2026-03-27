@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import type { UEModel } from '@/models/UEModel'
+import ProjectTypeLabel from './ProjectTypeLabel.vue'
 
 const router = useRouter()
 const projectService = useProjectService()
@@ -54,6 +55,9 @@ onUnmounted(() => {
 <template>
     <div class="project-detail" ref="modalRef">
         <div class="project_detail__header">
+            <div class="project_type_label">
+                <ProjectTypeLabel :projectType="project.projectType"/>
+            </div>
             <h1>{{ project.title }}</h1>
             <span class="close-button" @click="closeDetail">&Cross;</span>
         </div>
@@ -114,6 +118,17 @@ onUnmounted(() => {
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     box-shadow: 0px 0px 8px rgba(175, 175, 175, 0.411);
     transition: all 0.3s ease;
+    animation: zoomAtOpen 0.3s ease;
+}
+@keyframes zoomAtOpen {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
 }
 .project-detail::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
@@ -203,6 +218,10 @@ h1 {
 }
 .project_detail_content__links a:hover {
     text-decoration: underline;
+}
+
+.project_type_label {
+    margin: 1em;
 }
 .scroll-arrow {
     position: sticky;

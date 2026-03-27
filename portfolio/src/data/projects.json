@@ -1,11 +1,44 @@
 [
     {
         "id": "bde-info-tcg",
+        "projectType": "Academic",
         "title": "BDE INFO TCG",
         "description": "BDE INFO TCG est un jeu de cartes à collectionner développé dans le cadre d'un projet universitaire. Les cartes représentent des membres actuels ou anciens du Bureau Des Etudiants de l'IUT Informatique de la Doua. Le jeu offre des mecanismes de combat en temps réel, des ouvertures de booster, un magasin, et un système de collection. Les joueurs peuvent construire leur deck en choisissant parmi une variété de cartes, chacune ayant des compétences et des caractéristiques uniques. ",
         "image": "bdeinfo-tcg.png",
         "liveDemoLink": "https://bdeinfo-tcg.dvachette.fr",
         "competences": ["realiser", "optimiser", "administrer", "gerer", "conduire", "collaborer"],
         "programmingLanguages": ["JavaScript", "Vue", "SQL"]
+    },
+    {
+        "id": "jsnake",
+        "projectType": "Academic",
+        "title": "JSnake",
+        "description": "JSnake est une implémentation du jeu de Snake, en JavaScript. Le projet a été développé comme projet de bilan pour le module de programmation JavaScript",
+        "image": "jsnake.png",
+        "liveDemoLink": "https://jsnake-dvachette.vercel.app",
+        "sourceCodeLink": "https://github.com/dvachette/jsnake",
+        "competences": ["realiser"],
+        "programmingLanguages": ["JavaScript", "HTML/CSS"]
+    },
+    {
+        "id": "portfolio",
+        "projectType": "Academic",
+        "title": "Portfolio",
+        "description": "Ce portfolio a été développé pour présenter mes projets et compétences en tant que développeur. Il a été réalisé en utilisant Vue.js pour le frontend, avec une structure de composants réutilisables pour afficher les projets de manière attrayante.",
+        "image": "portfolio.png",
+        "sourceCodeLink": "https://github.com/dvachette/portfolio",
+        "competences": [],
+        "programmingLanguages": ["TypeScript", "Vue", "HTML/CSS"],
+        "liveDemoLink": "https://dvachette.fr"
+    },
+    {
+        "id": "unyx",
+        "projectType": "Personal",
+        "title": "Unyx",
+        "description": "Unyx est un simulateur de console linux développé en python. Il a été réalisé pour offrir une API de système de fichier virtuel, montable et modifiable à la volée, permettant de simuler des interactions avec un système de fichiers sans affecter le système hôte. Unyx est conçu pour être utilisé dans des environnements d'apprentissage, des tests de logiciels, ou tout autre contexte où une simulation de système de fichiers est nécessaire.",
+        "image": "unyx.png",
+        "sourceCodeLink": "https://github.com/dvachette/unixpy",
+        "programmingLanguages": ["Python"],
+        "competences": []
     }
 ]
