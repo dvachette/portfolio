@@ -4,16 +4,16 @@ import LanguageTag from './LanguageTag.vue'
 import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
 import { useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import type { UEModel } from '@/models/UEModel'
 
 const router = useRouter()
 const projectService = useProjectService()
 const projectId = ref(router.currentRoute.value.params.id as string)
-
-console.log('Project ID from route:', projectId)
 const project = ref<ProjectModel>(projectService.getProjectById(projectId.value))
-console.log('Fetched project:', project.value)
+
+const modalRef = ref<HTMLElement | null>(null)
+const scrollRatio = ref(0) // 0 = haut, 1 = tout en bas
 
 const base = import.meta.env.BASE_URL
 
@@ -33,9 +33,26 @@ watch(
         console.log('Fetched new project:', project.value)
     },
 )
+
+function onScroll() {
+    const el = modalRef.value
+    if (!el) return
+    const remaining = el.scrollHeight - el.scrollTop - el.clientHeight
+    // fade sur les derniers 80px
+    scrollRatio.value = Math.min(remaining / 80, 1)
+}
+
+onMounted(() => {
+    modalRef.value?.addEventListener('scroll', onScroll)
+    onScroll() // init
+})
+
+onUnmounted(() => {
+    modalRef.value?.removeEventListener('scroll', onScroll)
+})
 </script>
 <template>
-    <div class="project-detail">
+    <div class="project-detail" ref="modalRef">
         <div class="project_detail__header">
             <h1>{{ project.title }}</h1>
             <span class="close-button" @click="closeDetail">&Cross;</span>
@@ -76,6 +93,7 @@ watch(
                 @select="goToCompetence"
             />
         </div>
+        <span class="scroll-arrow" :style="{ opacity: scrollRatio }" aria-hidden="true">▼</span>
     </div>
 </template>
 <style scoped>
@@ -185,5 +203,27 @@ h1 {
 }
 .project_detail_content__links a:hover {
     text-decoration: underline;
+}
+.scroll-arrow {
+    position: sticky;
+    bottom: 12px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    font-size: 1.6em;
+    color: #ccc;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    animation: bounce 1.2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(6px);
+    }
 }
 </style>

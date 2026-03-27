@@ -5,7 +5,7 @@
         "description": "BDE INFO TCG est un jeu de cartes à collectionner développé dans le cadre d'un projet universitaire. Les cartes représentent des membres actuels ou anciens du Bureau Des Etudiants de l'IUT Informatique de la Doua. Le jeu offre des mecanismes de combat en temps réel, des ouvertures de booster, un magasin, et un système de collection. Les joueurs peuvent construire leur deck en choisissant parmi une variété de cartes, chacune ayant des compétences et des caractéristiques uniques. ",
         "image": "bdeinfo-tcg.png",
         "liveDemoLink": "https://bdeinfo-tcg.dvachette.fr",
-        "competences": [],
+        "competences": ["realiser", "optimiser", "administrer", "gerer", "conduire", "collaborer"],
         "programmingLanguages": ["JavaScript", "Vue", "SQL"]
     }
 ]

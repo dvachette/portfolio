@@ -12,7 +12,7 @@ function selectCompetence() {
 <template>
     <div class="competence_card" @click="selectCompetence">
         <div class="competence_card__header">
-            <CompetenceLevel :level="competence.level" :max="competence.levels.length"/>
+            <CompetenceLevel :level="competence.level" :max="competence.levels.length" />
             <h3 class="competence_card__name">{{ competence.name }}</h3>
         </div>
         <p class="competence_card__description">

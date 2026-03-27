@@ -7,5 +7,4 @@ export interface UEModel {
     level: number
     levels: UELevelModel[]
     details: UEDetailModel[]
-
 }

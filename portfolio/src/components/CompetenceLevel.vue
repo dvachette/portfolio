@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 interface CompetenceLevelProps {
-    level: number,
+    level: number
     max: number
-    
 }
 const { level, max } = defineProps<CompetenceLevelProps>()
 const isPopupVisible = ref(false)
