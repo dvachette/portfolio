@@ -36,6 +36,7 @@ function getProjectById(id: string): ProjectModel {
             image: 'notfound.png',
             competences: [],
             programmingLanguages: [],
+            projectType: 'Personal',
         }
     }
     return project
