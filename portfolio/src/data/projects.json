@@ -40,5 +40,15 @@
         "sourceCodeLink": "https://github.com/dvachette/unixpy",
         "programmingLanguages": ["Python"],
         "competences": []
+    },
+    {
+        "id": "yanosp",
+        "projectType": "Personal",
+        "title": "Yanosp",
+        "description": "Yanosp est un projet de système d'exploitation minimaliste compatible Linux, développé en C. Il a pour but de pouvoir faire fonctionner Minecraft: Java Edition, en utilisant une implémentation personnalisée de la JVM. Le projet est conçu pour être léger et rapide, offrant une expérience de jeu fluide tout en étant compatible avec les applications Linux standard.",
+        "image": "yanosp.png",
+        "sourceCodeLink": "https://github.com/dvachette/yanosp",
+        "programmingLanguages": ["C", "Assembly"],
+        "competences": []
     }
 ]

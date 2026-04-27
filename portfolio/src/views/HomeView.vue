@@ -7,8 +7,9 @@
             spécialise dans le développement d'applications, et me forme à tous les aspects du
             développement logiciel, du web au systèmes d'exploitation, en passant par les bases de
             données et les réseaux.
-            <br />
-            J'aime apprendre de nouvelles technologies et relever des défis techniques. Sur ce
+            <br/>
+            <br/>
+            J'aime me former à utiliser de nouvelles technologies et relever des défis techniques. Sur ce
             portfolio, vous trouverez une sélection de mes projets personnels et professionnels,
             ainsi que les compétences que j'ai acquises au fil de mes expériences. N'hésitez pas à
             me contacter pour discuter de mes projets ou de toute opportunité de collaboration !
