@@ -50,5 +50,15 @@
         "sourceCodeLink": "https://github.com/dvachette/yanosp",
         "programmingLanguages": ["C", "Assembly"],
         "competences": []
+    },
+    {
+        "id": "nicer-tomuss",
+        "projectType": "Personal",
+        "title": "Nicer Tomuss",
+        "description": "Nicer Tomuss est une extension de navigateur développée pour améliorer l'expérience utilisateur de Tomuss, une plateforme de gestion des notes utilisée par l'université Lyon1. L'extension utilise Vue.js pour offrir une interface utilisateur améliorée et une meilleure organisation des cours et des notes. Nicer Tomuss vise à rendre la gestion des notes plus intuitive et agréable pour les étudiants.",
+        "image": "nicer-tomuss.png",
+        "sourceCodeLink": "https://github.com/dvachette/nicer-tomuss",
+        "programmingLanguages": ["TypeScript", "Vue"],
+        "competences": []
     }
 ]
