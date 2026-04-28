@@ -2,32 +2,62 @@
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useUEService } from '@/services/UEService'
-import CompetenceLevel from './CompetenceLevel.vue'
 import { useProjectService } from '@/services/ProjectService'
+import type { UEModel } from '@/models/UEModel'
+import type { ProjectModel } from '@/models/ProjectModel'
+import CompetenceLevel from './CompetenceLevel.vue'
 import ProjectCard from './ProjectCard.vue'
 import CompetenceLevelCard from './CompetenceLevelCard.vue'
 import LevelProgressBar from './LevelProgressBar.vue'
+import SkeletonCompetenceDetail from './skeletons/SkeletonCompetenceDetail.vue'
+
 const router = useRouter()
 const route = useRoute()
 const ueService = useUEService()
 const projectService = useProjectService()
-const competenceId = ref(route.params.id)
 
-const competence = ref(ueService.getUEById(competenceId.value as string))
-const projects = ref(projectService.getProjectsByCompetenceId(competenceId.value as string))
-const selectedLevel = ref(competence.value.level || 1)
+const competenceId = ref(route.params.id as string)
+const competence = ref<UEModel | null>(null)
+const projects = ref<ProjectModel[]>([])
+const selectedLevel = ref(1)
+const loading = ref(true)
+const error = ref<string | null>(null)
 const modalRef = ref<HTMLElement | null>(null)
-const scrollRatio = ref(0) // 0 = haut, 1 = tout en bas
+const scrollRatio = ref(0)
 
-watch(
-    () => route.params.id,
-    (newId) => {
-        competenceId.value = newId as string
-        competence.value = ueService.getUEById(competenceId.value)
-        projects.value = projectService.getProjectsByCompetenceId(competenceId.value)
-        selectedLevel.value = competence.value.level || 1
-    },
-)
+async function loadData(id: string): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+        const [ue, projs] = await Promise.all([
+            ueService.getUEById(id),
+            projectService.getProjectsByCompetenceId(id),
+        ])
+        competence.value = ue
+        projects.value = projs
+        selectedLevel.value = ue.level || 1
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
+    } finally {
+        loading.value = false
+    }
+}
+
+watch(() => route.params.id, async function(newId) {
+    competenceId.value = newId as string
+    await loadData(competenceId.value)
+})
+
+onMounted(async function() {
+    modalRef.value?.addEventListener('scroll', onScroll)
+    onScroll()
+    await loadData(competenceId.value)
+})
+
+onUnmounted(function() {
+    modalRef.value?.removeEventListener('scroll', onScroll)
+})
+
 function goBack() {
     router.push('/competences')
 }
@@ -40,42 +70,35 @@ function onScroll() {
     const el = modalRef.value
     if (!el) return
     const remaining = el.scrollHeight - el.scrollTop - el.clientHeight
-    // fade sur les derniers 80px
     scrollRatio.value = Math.min(remaining / 80, 1)
 }
-
-onMounted(() => {
-    modalRef.value?.addEventListener('scroll', onScroll)
-    onScroll() // init
-})
-
-onUnmounted(() => {
-    modalRef.value?.removeEventListener('scroll', onScroll)
-})
 </script>
-<template>
-    <div class="competence_detail" ref="modalRef">
+
+<template v-else-if="competence">
+    <SkeletonCompetenceDetail v-if="loading" />
+    <span v-else-if="error">{{ error }}</span>  
+    <div v-else-if="competence" class="competence_detail" ref="modalRef">
         <div class="competence_detail__header">
             <div class="competence_level_container">
                 <CompetenceLevel
-                    :level="competence.level"
-                    :max="competence.levels.length"
+                    :level="competence!.level"
+                    :max="competence!.levels.length"
                     class="competence_level"
                 />
-                <h1 class="competence_detail__name">{{ competence.name }}</h1>
+                <h1 class="competence_detail__name">{{ competence!.name }}</h1>
             </div>
             <span class="close-button" @click="goBack">&Cross;</span>
         </div>
-        <p class="competence_detail__description">{{ competence.description }}</p>
+        <p class="competence_detail__description">{{ competence!.description }}</p>
         <div class="competence_detail__details">
             <LevelProgressBar
-                :level="competence.level"
-                :max="competence.levels.length"
+                :level="competence!.level"
+                :max="competence!.levels.length"
                 @levelSelected="selectLevel"
             />
             <div class="competence_detail__details_list">
                 <CompetenceLevelCard
-                    :UELevel="competence.levels.find((lvl) => lvl.level === selectedLevel)!"
+                    :UELevel="competence!.levels.find((lvl) => lvl.level === selectedLevel)!"
                     :level="selectedLevel"
                 />
             </div>

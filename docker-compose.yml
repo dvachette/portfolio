@@ -12,3 +12,5 @@ services:
     restart: unless-stopped
     env_file:
       - ./portfolio-backend/.env
+    volumes:
+      - ./portfolio-backend/data:/app/data

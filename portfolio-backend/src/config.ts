@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import path from 'path'
 dotenv.config();
 
 function required(key: string): string {
@@ -13,4 +14,5 @@ export const config = {
         token: required('DISCORD_TOKEN'),
         userId: required('DISCORD_USER_ID'),
     },
+    dataDir: path.resolve(__dirname, '..', 'data'),
 };

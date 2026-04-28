@@ -7,58 +7,69 @@ import { useProjectService } from '@/services/ProjectService'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import type { UEModel } from '@/models/UEModel'
 import ProjectTypeLabel from './ProjectTypeLabel.vue'
+import SkeletonProjectDetail from './skeletons/SkeletonProjectDetail.vue'
 
 const router = useRouter()
 const projectService = useProjectService()
 const projectId = ref(router.currentRoute.value.params.id as string)
-const project = ref<ProjectModel>(projectService.getProjectById(projectId.value))
-
+const project = ref<ProjectModel | null>(null)
+const loading = ref(true)
+const error = ref<string | null>(null)
 const modalRef = ref<HTMLElement | null>(null)
-const scrollRatio = ref(0) // 0 = haut, 1 = tout en bas
-
+const scrollRatio = ref(0)
 const base = import.meta.env.BASE_URL
+
+async function loadData(id: string): Promise<void> {
+    loading.value = true
+    error.value = null
+    try {
+        project!.value = await projectService.getProjectById(id)
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
+    } finally {
+        loading.value = false
+    }
+}
+
+watch(() => router.currentRoute.value.params.id, async function(newId) {
+    projectId.value = newId as string
+    await loadData(projectId.value)
+})
+
+onMounted(async function() {
+    modalRef.value?.addEventListener('scroll', onScroll)
+    onScroll()
+    await loadData(projectId.value)
+})
+
+onUnmounted(function() {
+    modalRef.value?.removeEventListener('scroll', onScroll)
+})
 
 function closeDetail() {
     router.push({ name: 'projects' })
 }
+
 function goToCompetence(competence: UEModel) {
     router.push({ name: 'competence-details', params: { id: competence.id } })
 }
-
-watch(
-    () => router.currentRoute.value.params.id,
-    (newId) => {
-        projectId.value = newId as string
-        project.value = projectService.getProjectById(projectId.value)
-        console.log('Route changed, new project ID:', projectId.value)
-        console.log('Fetched new project:', project.value)
-    },
-)
 
 function onScroll() {
     const el = modalRef.value
     if (!el) return
     const remaining = el.scrollHeight - el.scrollTop - el.clientHeight
-    // fade sur les derniers 80px
     scrollRatio.value = Math.min(remaining / 80, 1)
 }
-
-onMounted(() => {
-    modalRef.value?.addEventListener('scroll', onScroll)
-    onScroll() // init
-})
-
-onUnmounted(() => {
-    modalRef.value?.removeEventListener('scroll', onScroll)
-})
 </script>
 <template>
-    <div class="project-detail" ref="modalRef">
+    <SkeletonProjectDetail v-if="loading" />
+    <span v-else-if="error">{{ error }}</span>
+    <div v-else-if="project" class="project-detail" ref="modalRef">
         <div class="project_detail__header">
             <div class="project_type_label">
-                <ProjectTypeLabel :projectType="project.projectType" />
+                <ProjectTypeLabel :projectType="project!.projectType" />
             </div>
-            <h1>{{ project.title }}</h1>
+            <h1>{{ project!.title }}</h1>
             <span class="close-button" @click="closeDetail">&Cross;</span>
         </div>
         <div class="project_detail__content">
@@ -66,32 +77,32 @@ onUnmounted(() => {
                 <div class="project_detail__languages">
                     <LanguageTag
                         :language="language"
-                        v-for="language in project.programmingLanguages"
+                        v-for="language in project!.programmingLanguages"
                         :key="language"
                     />
                 </div>
-                <p>{{ project.description }}</p>
+                <p>{{ project!.description }}</p>
                 <div class="project_detail_content__links">
-                    <a :href="project.sourceCodeLink" target="_blank" v-if="project.sourceCodeLink"
+                    <a :href="project!.sourceCodeLink" target="_blank" v-if="project!.sourceCodeLink"
                         >Voir le code source</a
                     >
-                    <a :href="project.liveDemoLink" target="_blank" v-if="project.liveDemoLink"
+                    <a :href="project!.liveDemoLink" target="_blank" v-if="project!.liveDemoLink"
                         >Voir la démo en ligne</a
                     >
                 </div>
             </div>
 
             <div class="project_detail_content__image">
-                <img :src="`${base}images/${project.image}`" alt="Project image" />
+                <img :src="`${base}images/${project!.image}`" alt="Project image" />
             </div>
         </div>
         <div
             class="project_detail__competences"
-            v-if="project.competences && project.competences.length > 0"
+            v-if="project!.competences && project!.competences.length > 0"
         >
             <h2>Compétences utilisées</h2>
             <ProjectCompetenceCard
-                v-for="competence in project.competences"
+                v-for="competence in project!.competences"
                 :key="competence.id"
                 :competence="competence"
                 @select="goToCompetence"

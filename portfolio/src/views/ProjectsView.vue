@@ -1,14 +1,26 @@
 <script setup lang="ts">
 import { useProjectService } from '@/services/ProjectService'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import type { ProjectModel } from '@/models/ProjectModel'
 import ProjectCard from '@/components/ProjectCard.vue'
 import { useRouter } from 'vue-router'
+import SkeletonProjectsList from '@/components/skeletons/SkeletonProjectsList.vue'
 
 const projectService = useProjectService()
 const projects = ref<ProjectModel[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
 const router = useRouter()
-projects.value = projectService.getProjectTab()
+
+onMounted(async function() {
+    try {
+        projects.value = await projectService.getProjectTab()
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
+    } finally {
+        loading.value = false
+    }
+})
 
 function selectProject(project: ProjectModel) {
     router.push({ path: `/projects/${project.id}` })
@@ -16,7 +28,9 @@ function selectProject(project: ProjectModel) {
 </script>
 <template>
     <h1>Mes projets</h1>
-    <div class="projects-list">
+    <SkeletonProjectsList v-if="loading" />
+    <span v-else-if="error">{{ error }}</span>
+    <div v-else class="projects-list">
         <ProjectCard
             v-for="project in projects"
             :key="project.title"
