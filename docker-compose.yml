@@ -4,3 +4,13 @@ services:
     ports:
       - "127.0.0.1:3001:80"
     restart: unless-stopped
+
+  portfolio-backend:
+    build: ./portfolio-backend
+    ports:
+      - "127.0.0.1:3003:3000"
+    restart: unless-stopped
+    env_file:
+      - ./portfolio-backend/.env
+    volumes:
+      - ./portfolio-backend/data:/app/data

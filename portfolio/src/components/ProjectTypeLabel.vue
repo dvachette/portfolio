@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProjectType } from '@/types/ProjectType';
+import type { ProjectType } from '@/types/ProjectType'
 import { ref } from 'vue'
 interface CompetenceLevelProps {
     projectType: ProjectType
@@ -13,12 +13,15 @@ function showPopup() {
 function hidePopup() {
     isPopupVisible.value = false
 }
-
-
 </script>
 <template>
     <div class="project_type" @mouseover="showPopup" @click="showPopup">
-        <img :src="`${base}images/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`" alt="Type de projet" class="project_type_icon" :class="`project_type--${projectType}`" />    
+        <img
+            :src="`${base}images/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`"
+            alt="Type de projet"
+            class="project_type_icon"
+            :class="`project_type--${projectType}`"
+        />
     </div>
     <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
         <p v-if="projectType === 'Academic'">Projet scolaire</p>

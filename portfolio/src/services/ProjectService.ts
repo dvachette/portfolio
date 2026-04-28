@@ -1,58 +1,38 @@
-import projects from '@/data/projects.json'
 import type { ProjectModel } from '@/models/ProjectModel'
-import { useUEService } from './UEService'
-const ueService = useUEService()
-function getProjectTab(): ProjectModel[] {
-    // Replace the id's in the projects with the actual competence objects
+import { getCache, setCache } from '@/composables/useCache'
 
-    const projectsTab = projects.map((project) => {
-        const projectCompetences = project.competences.map((competenceId) => {
-            const competence = ueService.getUEById(competenceId)
-            if (competence.id === 'not-found') {
-                console.warn(
-                    `Competence with id ${competenceId} not found for project ${project.id}.`,
-                )
-            }
-            return competence
-        })
-        return {
-            ...project,
-            competences: projectCompetences,
-        } as ProjectModel
-    })
-    console.log('Loaded projects:', projectsTab)
+const API_URL = import.meta.env.VITE_API_URL
 
-    return projectsTab
+export async function getProjectTab(): Promise<ProjectModel[]> {
+    const cached = getCache<ProjectModel[]>('projects')
+    if (cached) return cached
+    const res = await fetch(`${API_URL}/projects`)
+    if (!res.ok) throw new Error('Erreur lors du chargement des projets')
+    const data = await res.json()
+    setCache('projects', data)
+    return data
 }
 
-function getProjectById(id: string): ProjectModel {
-    let project = getProjectTab().find((project) => project.id === id) as ProjectModel | undefined
-    if (!project) {
-        console.warn(`Project with id ${id} not found.`)
-        project = {
-            id: 'unknown',
-            title: 'Projet non trouvé',
-            description: "Le projet que vous cherchez n'existe pas ou a été supprimé.",
-            image: 'notfound.png',
-            competences: [],
-            programmingLanguages: [],
-            projectType: 'Personal',
-        }
-    }
-    return project
+export async function getProjectById(id: string): Promise<ProjectModel> {
+    const cached = getCache<ProjectModel>(`projects:${id}`)
+    if (cached) return cached
+    const res = await fetch(`${API_URL}/projects/${id}`)
+    if (!res.ok) throw new Error(`Erreur lors du chargement du projet ${id}`)
+    const data = await res.json()
+    setCache(`projects:${id}`, data)
+    return data
 }
 
-function getProjectsByCompetenceId(competenceId: string): ProjectModel[] {
-    const projectsTab = getProjectTab()
-    return projectsTab.filter((project) =>
-        project.competences.some((competence) => competence.id === competenceId),
-    )
+export async function getProjectsByCompetenceId(competenceId: string): Promise<ProjectModel[]> {
+    const cached = getCache<ProjectModel[]>(`projects:by-competence:${competenceId}`)
+    if (cached) return cached
+    const res = await fetch(`${API_URL}/projects/by-competence/${competenceId}`)
+    if (!res.ok) throw new Error(`Erreur lors du chargement des projets pour la compétence ${competenceId}`)
+    const data = await res.json()
+    setCache(`projects:by-competence:${competenceId}`, data)
+    return data
 }
 
 export function useProjectService() {
-    return {
-        getProjectTab,
-        getProjectById,
-        getProjectsByCompetenceId,
-    }
+    return { getProjectTab, getProjectById, getProjectsByCompetenceId }
 }

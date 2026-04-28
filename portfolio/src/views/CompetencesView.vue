@@ -1,24 +1,37 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
+import SkeletonCompetencesList from '@/components/skeletons/SkeletonCompetencesList.vue'
 import type { UEModel } from '@/models/UEModel'
 import { useUEService } from '@/services/UEService'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 const ueService = useUEService()
-const competences = ref(ueService.getUEsTab())
+const competences = ref<UEModel[]>([])
+const loading = ref(true)
+const error = ref<string | null>(null)
 
-const openDetail = (competence: UEModel) => {
-    console.log('Selected competence:', competence)
+onMounted(async function() {
+    try {
+        competences.value = await ueService.getUEsTab()
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
+    } finally {
+        loading.value = false
+    }
+})
+
+function openDetail(competence: UEModel) {
     router.push(`/competences/${competence.id}`)
 }
 </script>
 
 <template>
     <h1>Compétences</h1>
-    <div class="competences">
+    <SkeletonCompetencesList v-if="loading" />
+    <span v-else-if="error">{{ error }}</span>
+    <div v-else class="competences">
         <CompetenceCard
             v-for="competence in competences"
             :key="competence.name"
