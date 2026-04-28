@@ -56,7 +56,7 @@ onUnmounted(() => {
     <div class="project-detail" ref="modalRef">
         <div class="project_detail__header">
             <div class="project_type_label">
-                <ProjectTypeLabel :projectType="project.projectType"/>
+                <ProjectTypeLabel :projectType="project.projectType" />
             </div>
             <h1>{{ project.title }}</h1>
             <span class="close-button" @click="closeDetail">&Cross;</span>
