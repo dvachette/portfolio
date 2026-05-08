@@ -4,7 +4,6 @@
             <h1>Me contacter</h1>
 
             <div class="contact__links">
-                <a class="btn" target="blank" href="mailto:donatien.vachette@gmail.com">M'envoyer un mail</a>
                 <a class="btn" target="blank" href="https://www.linkedin.com/in/donatien-vachette/">Mon LinkedIn</a>
                 <a class="btn" target="blank" href="https://www.github.com/dvachette">Mon GitHub</a>
                 <a class="btn" target="_blank" href="/cv_donatien_vachette-latest.pdf">Mon CV</a>
@@ -12,7 +11,7 @@
 
             <div class="contact__divider" />
 
-            <h2>Formulaire de contact</h2>
+            <h2>Me contacter</h2>
 
             <div v-if="status === 'success'" class="contact__feedback contact__feedback--success">
                 Message envoyé avec succès !

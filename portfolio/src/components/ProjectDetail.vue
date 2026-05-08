@@ -18,6 +18,9 @@ const error = ref<string | null>(null)
 const modalRef = ref<HTMLElement | null>(null)
 const scrollRatio = ref(0)
 const base = import.meta.env.BASE_URL
+const CLOSE_ANIMATION_DURATION = 300 // Durée de l'animation de fermeture en ms
+const isClosing = ref(false)
+
 
 async function loadData(id: string): Promise<void> {
     loading.value = true
@@ -39,16 +42,28 @@ watch(() => router.currentRoute.value.params.id, async function(newId) {
 
 onMounted(async function() {
     modalRef.value?.addEventListener('scroll', onScroll)
+    document.addEventListener('keydown', onKeyDown)
     onScroll()
     await loadData(projectId.value)
 })
 
 onUnmounted(function() {
     modalRef.value?.removeEventListener('scroll', onScroll)
+    document.removeEventListener('keydown', onKeyDown)
 })
 
+function onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+        closeDetail()
+    }
+}
+
 function closeDetail() {
-    router.push({ name: 'projects' })
+    if (isClosing.value) return
+    isClosing.value = true
+    setTimeout(() => {
+        void router.push({ name: 'projects' })
+    }, CLOSE_ANIMATION_DURATION)
 }
 
 function goToCompetence(competence: UEModel) {
@@ -64,7 +79,12 @@ function onScroll() {
 </script>
 <template>
     <span v-if="error">{{ error }}</span>
-    <div v-else-if="project || loading" class="project-detail" ref="modalRef">
+    <div 
+        v-else-if="project || loading"
+        class="project-detail"
+        :class="{ 'competence_detail--closing': isClosing }"
+        ref="modalRef"
+    >
         <template v-if="project">
             <div class="project_detail__header">
                 <div class="project_type_label">
@@ -144,6 +164,22 @@ function onScroll() {
         opacity: 1;
     }
 }
+
+@keyframes zoomAtClose {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
+.competence_detail--closing {
+    animation: zoomAtClose 0.3s ease forwards;
+    pointer-events: none;
+}
+
 .project-detail::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
 }

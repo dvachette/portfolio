@@ -13,6 +13,11 @@ const app = express();
 app.use(cors({
     origin: ['https://dvachette.fr', 'http://localhost', /^http:\/\/localhost:\d+$/],
 }));
+// Middleware for developpement : add a delay to all responses
+// app.use((req, res, next) => {
+//     setTimeout(next, 1000);
+// });
+
 app.use(express.json());
 app.use('/contact', rateLimiter);
 app.use('/contact', contactRouter);

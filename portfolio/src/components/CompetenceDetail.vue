@@ -24,6 +24,9 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const modalRef = ref<HTMLElement | null>(null)
 const scrollRatio = ref(0)
+const CLOSE_ANIMATION_DURATION = 300 // Durée de l'animation de fermeture en ms
+const isClosing = ref(false)
+
 
 async function loadData(id: string): Promise<void> {
     competence.value = null
@@ -52,16 +55,28 @@ watch(() => route.params.id, async function(newId) {
 
 onMounted(async function() {
     modalRef.value?.addEventListener('scroll', onScroll)
+    document.addEventListener('keydown', onKeyDown)
     onScroll()
     await loadData(competenceId.value)
 })
 
 onUnmounted(function() {
     modalRef.value?.removeEventListener('scroll', onScroll)
+    document.removeEventListener('keydown', onKeyDown)
 })
 
+function onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+        goBack()
+    }
+}
+
 function goBack() {
-    router.push('/competences')
+    if (isClosing.value) return
+    isClosing.value = true
+    setTimeout(() => {
+        void router.push('/competences')
+    }, CLOSE_ANIMATION_DURATION)
 }
 
 function selectLevel(level: number) {
@@ -78,7 +93,12 @@ function onScroll() {
 
 <template>
     <span v-if="error">{{ error }}</span>  
-    <div v-else-if="competence || loading" class="competence_detail" ref="modalRef">
+    <div
+        v-else-if="competence || loading" 
+        class="competence_detail"
+        ref="modalRef"
+        :class="{ 'competence_detail--closing': isClosing }"
+    >
         <template v-if="competence">
             <div class="competence_detail__header">
                 <div class="competence_level_container">
@@ -150,6 +170,21 @@ function onScroll() {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
     }
+}
+
+@keyframes zoomAtClose {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+}
+.competence_detail--closing {
+    animation: zoomAtClose 0.3s ease forwards;
+    pointer-events: none;
 }
 .competence_detail::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
