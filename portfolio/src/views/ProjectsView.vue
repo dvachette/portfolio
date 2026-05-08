@@ -4,7 +4,6 @@ import { ref, onMounted } from 'vue'
 import type { ProjectModel } from '@/models/ProjectModel'
 import ProjectCard from '@/components/ProjectCard.vue'
 import { useRouter } from 'vue-router'
-import SkeletonProjectsList from '@/components/skeletons/SkeletonProjectsList.vue'
 
 const projectService = useProjectService()
 const projects = ref<ProjectModel[]>([])
@@ -28,8 +27,7 @@ function selectProject(project: ProjectModel) {
 </script>
 <template>
     <h1>Mes projets</h1>
-    <SkeletonProjectsList v-if="loading" />
-    <span v-else-if="error">{{ error }}</span>
+    <span v-if="error">{{ error }}</span>
     <div v-else class="projects-list">
         <ProjectCard
             v-for="project in projects"

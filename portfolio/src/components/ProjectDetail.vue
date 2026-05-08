@@ -22,6 +22,7 @@ const base = import.meta.env.BASE_URL
 async function loadData(id: string): Promise<void> {
     loading.value = true
     error.value = null
+    project.value = null
     try {
         project!.value = await projectService.getProjectById(id)
     } catch (e) {
@@ -62,53 +63,55 @@ function onScroll() {
 }
 </script>
 <template>
-    <SkeletonProjectDetail v-if="loading" />
-    <span v-else-if="error">{{ error }}</span>
-    <div v-else-if="project" class="project-detail" ref="modalRef">
-        <div class="project_detail__header">
-            <div class="project_type_label">
-                <ProjectTypeLabel :projectType="project!.projectType" />
-            </div>
-            <h1>{{ project!.title }}</h1>
-            <span class="close-button" @click="closeDetail">&Cross;</span>
-        </div>
-        <div class="project_detail__content">
-            <div class="project_detail_content__text">
-                <div class="project_detail__languages">
-                    <LanguageTag
-                        :language="language"
-                        v-for="language in project!.programmingLanguages"
-                        :key="language"
-                    />
+    <span v-if="error">{{ error }}</span>
+    <div v-else-if="project || loading" class="project-detail" ref="modalRef">
+        <template v-if="project">
+            <div class="project_detail__header">
+                <div class="project_type_label">
+                    <ProjectTypeLabel :projectType="project!.projectType" />
                 </div>
-                <p>{{ project!.description }}</p>
-                <div class="project_detail_content__links">
-                    <a :href="project!.sourceCodeLink" target="_blank" v-if="project!.sourceCodeLink"
-                        >Voir le code source</a
-                    >
-                    <a :href="project!.liveDemoLink" target="_blank" v-if="project!.liveDemoLink"
-                        >Voir la démo en ligne</a
-                    >
-                </div>
+                <h1>{{ project!.title }}</h1>
+                <span class="close-button" @click="closeDetail">&Cross;</span>
             </div>
+            <div class="project_detail__content">
+                <div class="project_detail_content__text">
+                    <div class="project_detail__languages">
+                        <LanguageTag
+                            :language="language"
+                            v-for="language in project!.programmingLanguages"
+                            :key="language"
+                        />
+                    </div>
+                    <p>{{ project!.description }}</p>
+                    <div class="project_detail_content__links">
+                        <a :href="project!.sourceCodeLink" target="_blank" v-if="project!.sourceCodeLink"
+                            >Voir le code source</a
+                        >
+                        <a :href="project!.liveDemoLink" target="_blank" v-if="project!.liveDemoLink"
+                            >Voir la démo en ligne</a
+                        >
+                    </div>
+                </div>
 
-            <div class="project_detail_content__image">
-                <img :src="`${base}images/${project!.image}`" alt="Project image" />
+                <div class="project_detail_content__image">
+                    <img :src="`${base}images/${project!.image}`" alt="Project image" />
+                </div>
             </div>
-        </div>
-        <div
-            class="project_detail__competences"
-            v-if="project!.competences && project!.competences.length > 0"
-        >
-            <h2>Compétences utilisées</h2>
-            <ProjectCompetenceCard
-                v-for="competence in project!.competences"
-                :key="competence.id"
-                :competence="competence"
-                @select="goToCompetence"
-            />
-        </div>
-        <span class="scroll-arrow" :style="{ opacity: scrollRatio }" aria-hidden="true">▼</span>
+            <div
+                class="project_detail__competences"
+                v-if="project!.competences && project!.competences.length > 0"
+            >
+                <h2>Compétences utilisées</h2>
+                <ProjectCompetenceCard
+                    v-for="competence in project!.competences"
+                    :key="competence.id"
+                    :competence="competence"
+                    @select="goToCompetence"
+                />
+            </div>
+            <span class="scroll-arrow" :style="{ opacity: scrollRatio }" aria-hidden="true">▼</span>
+        </template>
+        <SkeletonProjectDetail v-else-if="loading" />
     </div>
 </template>
 <style scoped>

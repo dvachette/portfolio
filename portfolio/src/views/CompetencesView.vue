@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
-import SkeletonCompetencesList from '@/components/skeletons/SkeletonCompetencesList.vue'
 import type { UEModel } from '@/models/UEModel'
 import { useUEService } from '@/services/UEService'
 import { ref, onMounted } from 'vue'
@@ -29,8 +28,7 @@ function openDetail(competence: UEModel) {
 
 <template>
     <h1>Compétences</h1>
-    <SkeletonCompetencesList v-if="loading" />
-    <span v-else-if="error">{{ error }}</span>
+    <span v-if="error">{{ error }}</span>
     <div v-else class="competences">
         <CompetenceCard
             v-for="competence in competences"

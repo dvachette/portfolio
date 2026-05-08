@@ -26,6 +26,8 @@ const modalRef = ref<HTMLElement | null>(null)
 const scrollRatio = ref(0)
 
 async function loadData(id: string): Promise<void> {
+    competence.value = null
+    projects.value = []
     loading.value = true
     error.value = null
     try {
@@ -74,45 +76,49 @@ function onScroll() {
 }
 </script>
 
-<template v-else-if="competence">
-    <SkeletonCompetenceDetail v-if="loading" />
-    <span v-else-if="error">{{ error }}</span>  
-    <div v-else-if="competence" class="competence_detail" ref="modalRef">
-        <div class="competence_detail__header">
-            <div class="competence_level_container">
-                <CompetenceLevel
+<template>
+    <span v-if="error">{{ error }}</span>  
+    <div v-else-if="competence || loading" class="competence_detail" ref="modalRef">
+        <template v-if="competence">
+            <div class="competence_detail__header">
+                <div class="competence_level_container">
+                    <CompetenceLevel
+                        :level="competence!.level"
+                        :max="competence!.levels.length"
+                        class="competence_level"
+                    />
+                    <h1 class="competence_detail__name">{{ competence!.name }}</h1>
+                </div>
+                <span class="close-button" @click="goBack">&Cross;</span>
+            </div>
+            <p class="competence_detail__description">{{ competence!.description }}</p>
+            <div class="competence_detail__details">
+                <LevelProgressBar
                     :level="competence!.level"
                     :max="competence!.levels.length"
-                    class="competence_level"
+                    @levelSelected="selectLevel"
                 />
-                <h1 class="competence_detail__name">{{ competence!.name }}</h1>
+                <div class="competence_detail__details_list">
+                    <CompetenceLevelCard
+                        :UELevel="competence!.levels.find((lvl) => lvl.level === selectedLevel)!"
+                        :level="selectedLevel"
+                    />
+                </div>
             </div>
-            <span class="close-button" @click="goBack">&Cross;</span>
-        </div>
-        <p class="competence_detail__description">{{ competence!.description }}</p>
-        <div class="competence_detail__details">
-            <LevelProgressBar
-                :level="competence!.level"
-                :max="competence!.levels.length"
-                @levelSelected="selectLevel"
-            />
-            <div class="competence_detail__details_list">
-                <CompetenceLevelCard
-                    :UELevel="competence!.levels.find((lvl) => lvl.level === selectedLevel)!"
-                    :level="selectedLevel"
-                />
-            </div>
-        </div>
-        <h2 v-if="projects.length > 0">Projets associés</h2>
-        <div v-if="projects.length > 0" class="competence_detail__projects">
-            <ProjectCard
-                v-for="project in projects"
-                :key="project.title"
-                :project="project"
-                @select="(selectedProject) => router.push(`/projects/${selectedProject.id}`)"
-            />
-        </div>
-        <span class="scroll-arrow" :style="{ opacity: scrollRatio }" aria-hidden="true">▼</span>
+            <template v-if="projects.length > 0">
+                <h2>Projets associés</h2>
+                <div class="competence_detail__projects">
+                    <ProjectCard
+                        v-for="project in projects"
+                        :key="project.title"
+                        :project="project"
+                        @select="(selectedProject) => router.push(`/projects/${selectedProject.id}`)"
+                    />
+                </div>
+            </template> 
+            <span class="scroll-arrow" :style="{ opacity: scrollRatio }" aria-hidden="true">▼</span>
+        </template>
+        <SkeletonCompetenceDetail v-else-if="loading" />
     </div>
 </template>
 <style scoped>

@@ -1,25 +1,23 @@
 <template>
-    <div class="project-detail">
-        <div class="project_detail__header">
-            <SkeletonBlock width="80px" height="24px" border-radius="4px" />
-            <SkeletonBlock width="220px" height="28px" border-radius="4px" />
-        </div>
-        <div class="project_detail__content">
-            <div class="text">
-                <div class="languages">
-                    <SkeletonBlock v-for="i in 3" :key="i" width="60px" height="24px" border-radius="12px" />
-                </div>
-                <SkeletonBlock width="100%" height="14px" border-radius="4px" />
-                <SkeletonBlock width="90%" height="14px" border-radius="4px" />
-                <SkeletonBlock width="80%" height="14px" border-radius="4px" />
+    <div class="project_detail__header">
+        <SkeletonBlock width="80px" height="24px" border-radius="4px" />
+        <SkeletonBlock width="220px" height="28px" border-radius="4px" />
+    </div>
+    <div class="project_detail__content">
+        <div class="text">
+            <div class="languages">
+                <SkeletonBlock v-for="i in 3" :key="i" width="60px" height="24px" border-radius="12px" />
             </div>
-            <SkeletonBlock width="40%" height="180px" border-radius="8px" />
+            <SkeletonBlock width="100%" height="14px" border-radius="4px" />
+            <SkeletonBlock width="90%" height="14px" border-radius="4px" />
+            <SkeletonBlock width="80%" height="14px" border-radius="4px" />
         </div>
-        <div class="competences">
-            <SkeletonBlock width="160px" height="20px" border-radius="4px" />
-            <div class="competences_list">
-                <SkeletonBlock v-for="i in 3" :key="i" width="140px" height="36px" border-radius="6px" />
-            </div>
+        <SkeletonBlock width="40%" height="180px" border-radius="8px" />
+    </div>
+    <div class="competences">
+        <SkeletonBlock width="160px" height="20px" border-radius="4px" />
+        <div class="competences_list">
+            <SkeletonBlock v-for="i in 3" :key="i" width="140px" height="36px" border-radius="6px" />
         </div>
     </div>
 </template>
