@@ -22,16 +22,19 @@ function hidePopup() {
             class="project_type_icon"
             :class="`project_type--${projectType}`"
         />
-    </div>
-    <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
-        <p v-if="projectType === 'Academic'">Projet scolaire</p>
-        <p v-else-if="projectType === 'Personal'">Projet personnel</p>
-        <p v-else>Type de projet inconnu</p>
+        <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
+            <p v-if="projectType === 'Academic'">Projet scolaire</p>
+            <p v-else-if="projectType === 'Personal'">Projet personnel</p>
+            <p v-else>Type de projet inconnu</p>
+        </div>
     </div>
 </template>
 <style scoped>
 .popup {
     position: absolute;
+    top:0;
+    left: 0;
+    transform: translate(0, -25%);
     background-color: #333;
     color: #fff;
     padding: 10px;
@@ -49,6 +52,5 @@ function hidePopup() {
 .project_type_icon {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
 }
 </style>
