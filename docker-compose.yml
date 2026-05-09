@@ -4,6 +4,8 @@ services:
     ports:
       - "127.0.0.1:3001:80"
     restart: unless-stopped
+    volumes:
+      - ./portfolio-images/projects:/usr/local/apache2/htdocs/images/projects
 
   portfolio-backend:
     build: ./portfolio-backend
