@@ -17,7 +17,7 @@ function hidePopup() {
 <template>
     <div class="project_type" @mouseover="showPopup" @click="showPopup">
         <img
-            :src="`${base}images/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`"
+            :src="`${base}assets/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`"
             alt="Type de projet"
             class="project_type_icon"
             :class="`project_type--${projectType}`"

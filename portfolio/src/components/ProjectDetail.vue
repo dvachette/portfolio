@@ -114,7 +114,7 @@ function onScroll() {
                 </div>
 
                 <div class="project_detail_content__image">
-                    <img :src="`${base}images/${project!.image}`" alt="Project image" />
+                    <img :src="`${base}images/projects/${project!.image}`" alt="Project image" />
                 </div>
             </div>
             <div

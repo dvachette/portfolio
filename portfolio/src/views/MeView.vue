@@ -1,3 +1,6 @@
+<script setup lang="ts">
+const base = import.meta.env.BASE_URL;
+</script>
 <template>
     <div class="me">
         <h1>À propos de moi</h1>
@@ -34,7 +37,7 @@
                 </p>
             </div>
             <div class="image">
-                <img src="/images/me.jpg" alt="Photo de moi" />
+                <img :src="`${base}/assets/me.jpg`" alt="Photo de moi" />
             </div>
         </div>
     </div>

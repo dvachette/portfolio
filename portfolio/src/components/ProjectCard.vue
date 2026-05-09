@@ -29,7 +29,7 @@ const emit = defineEmits(['select'])
             </p>
         </div>
         <div class="project_card__image">
-            <img :src="`${base}images/${project.image}`" alt="Project image" />
+            <img :src="`${base}images/projects/${project.image}`" alt="Project image" />
         </div>
     </div>
 </template>
