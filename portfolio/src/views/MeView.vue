@@ -37,7 +37,7 @@ const base = import.meta.env.BASE_URL;
                 </p>
             </div>
             <div class="image">
-                <img :src="`${base}/assets/me.jpg`" alt="Photo de moi" />
+                <img :src="`${base}assets/me.jpg`" alt="Photo de moi" />
             </div>
         </div>
     </div>
