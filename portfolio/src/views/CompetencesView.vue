@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
+import ProgramingLanguage from '@/components/ProgramingLanguage.vue'
 import type { UEModel } from '@/models/UEModel'
 import { useUEService } from '@/services/UEService'
 import { ref, onMounted } from 'vue'
@@ -27,7 +28,7 @@ function openDetail(competence: UEModel) {
 </script>
 
 <template>
-    <h1>Compétences</h1>
+    <h1>Compétences du référentiel</h1>
     <span v-if="error">{{ error }}</span>
     <div v-else class="competences">
         <CompetenceCard
@@ -37,6 +38,7 @@ function openDetail(competence: UEModel) {
             @select="openDetail"
         />
     </div>
+    <ProgramingLanguage name="Python" />
     <RouterView />
 </template>
 <style scoped>
