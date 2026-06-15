@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import CompetenceLevel from './CompetenceLevel.vue'
 import type { SkillModel } from '@/models/SkillModel'
+const base = import.meta.env.BASE_URL
 const { competence } = defineProps<{ competence: SkillModel }>()
 const emit = defineEmits(['select'])
 function selectCompetence() {
@@ -18,7 +19,10 @@ function selectCompetence() {
             />
             <h3 class="competence_card__name">{{ competence.name }}</h3>
         </div>
-        <p class="competence_card__description">{{ competence.description }}</p>
+        <div class="competence_card__content">
+            <p class="competence_card__description">{{ competence.description }}</p>
+            <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="Competence image" class="skill-img" />
+        </div>
     </div>
 </template>
 <style scoped>
@@ -49,6 +53,17 @@ function selectCompetence() {
     font-weight: bold;
     color: #fff;
     margin-left: 10px;
+}
+.competence_card__content {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.skill-img {
+    max-width: 100px;
+    max-height: 100px;
+    margin-left: 20px;
+    border-radius: 8px;
 }
 .competence_card__description {
     font-size: 1em;

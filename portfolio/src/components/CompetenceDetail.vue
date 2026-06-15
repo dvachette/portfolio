@@ -11,10 +11,13 @@ import CompetenceLevelCard from './CompetenceLevelCard.vue'
 import LevelProgressBar from './LevelProgressBar.vue'
 import SkeletonCompetenceDetail from './skeletons/SkeletonCompetenceDetail.vue'
 
+const base = import.meta.env.BASE_URL
+
 const router = useRouter()
 const route = useRoute()
 const ueService = useSkillsService()
 const projectService = useProjectService()
+
 
 const competenceId = ref(route.params.id as string)
 const competence = ref<SkillModel | null>(null)
@@ -112,7 +115,15 @@ function onScroll() {
                 </div>
                 <span class="close-button" @click="goBack">&Cross;</span>
             </div>
-            <p class="competence_detail__description">{{ competence!.description }}</p>
+            <div class="competence_detail__content">
+                <p class="competence_detail__description">{{ competence!.description }}</p>
+                <img
+                    v-if="competence!.image"
+                    :src="competence!.image.startsWith('http') ? competence!.image : `${base}assets/${competence!.image}`"
+                    alt="Competence image"
+                    class="skill-img"
+                />
+            </div>    
             <div class="competence_detail__details">
                 <LevelProgressBar
                     :level="competence!.level"
@@ -192,6 +203,18 @@ function onScroll() {
 }
 .competence_detail:hover {
     box-shadow: 0px 0px 18px rgba(175, 175, 175, 0.8);
+}
+.competence_detail__content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+}
+.competence_detail__content img {
+    max-width: 200px;
+    max-height: 200px;
+    margin-left: 20px;
+    border-radius: 8px;
 }
 .competence_detail__header {
     display: flex;
