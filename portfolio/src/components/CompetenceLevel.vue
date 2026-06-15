@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 interface CompetenceLevelProps {
+    level_title: string
     level: number
     max: number
 }
@@ -15,12 +16,10 @@ function hidePopup() {
 </script>
 <template>
     <div class="competence" @mouseover="showPopup" @click="showPopup">
-        <div class="competence_level" :class="`competence_level--${max - level}`"></div>
+        <div class="competence_level" :style="`background-color: hsl(${(level) * (100 / (max))}, 100%, 50%)`"></div>
     </div>
     <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
-        <p v-if="level === 1">Niveau 1</p>
-        <p v-else-if="level === 2">Niveau 2</p>
-        <p v-else>Niveau 3</p>
+        <p>{{ level_title }}</p>
     </div>
 </template>
 <style scoped>
@@ -50,14 +49,5 @@ function hidePopup() {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-}
-.competence_level--0 {
-    background-color: rgb(59, 197, 4);
-}
-.competence_level--1 {
-    background-color: yellow;
-}
-.competence_level--2 {
-    background-color: orange;
 }
 </style>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { UEModel } from '@/models/UEModel'
+import type { SkillModel } from '@/models/SkillModel'
 import CompetenceLevel from './CompetenceLevel.vue'
 const { competence } = defineProps<{
-    competence: UEModel
+    competence: SkillModel
 }>()
 const emit = defineEmits(['select'])
 function selectCompetence() {
@@ -12,7 +12,11 @@ function selectCompetence() {
 <template>
     <div class="competence_card" @click="selectCompetence">
         <div class="competence_card__header">
-            <CompetenceLevel :level="competence.level" :max="competence.levels.length" />
+            <CompetenceLevel 
+                :level="competence.level" 
+                :max="competence.levels.length" 
+                :level_title="`Niveau ${ competence!.level }`"
+            />
             <h3 class="competence_card__name">{{ competence.name }}</h3>
         </div>
         <p class="competence_card__description">

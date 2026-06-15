@@ -5,7 +5,7 @@ import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
 import { useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import type { UEModel } from '@/models/UEModel'
+import type { SkillModel } from '@/models/SkillModel'
 import ProjectTypeLabel from './ProjectTypeLabel.vue'
 import SkeletonProjectDetail from './skeletons/SkeletonProjectDetail.vue'
 
@@ -66,7 +66,7 @@ function closeDetail() {
     }, CLOSE_ANIMATION_DURATION)
 }
 
-function goToCompetence(competence: UEModel) {
+function goToCompetence(competence: SkillModel) {
     router.push({ name: 'competence-details', params: { id: competence.id } })
 }
 

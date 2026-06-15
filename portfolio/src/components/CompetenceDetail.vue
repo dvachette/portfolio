@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { useUEService } from '@/services/UEService'
+import { useSkillsService } from '@/services/SkillsService.ts'
 import { useProjectService } from '@/services/ProjectService'
-import type { UEModel } from '@/models/UEModel'
+import type { SkillModel } from '@/models/SkillModel'
 import type { ProjectModel } from '@/models/ProjectModel'
 import CompetenceLevel from './CompetenceLevel.vue'
 import ProjectCard from './ProjectCard.vue'
@@ -13,11 +13,11 @@ import SkeletonCompetenceDetail from './skeletons/SkeletonCompetenceDetail.vue'
 
 const router = useRouter()
 const route = useRoute()
-const ueService = useUEService()
+const ueService = useSkillsService()
 const projectService = useProjectService()
 
 const competenceId = ref(route.params.id as string)
-const competence = ref<UEModel | null>(null)
+const competence = ref<SkillModel | null>(null)
 const projects = ref<ProjectModel[]>([])
 const selectedLevel = ref(1)
 const loading = ref(true)
@@ -35,7 +35,7 @@ async function loadData(id: string): Promise<void> {
     error.value = null
     try {
         const [ue, projs] = await Promise.all([
-            ueService.getUEById(id),
+            ueService.getSkillById(id),
             projectService.getProjectsByCompetenceId(id),
         ])
         competence.value = ue
@@ -105,6 +105,7 @@ function onScroll() {
                     <CompetenceLevel
                         :level="competence!.level"
                         :max="competence!.levels.length"
+                        :level_title="`Niveau ${ competence!.level }`"
                         class="competence_level"
                     />
                     <h1 class="competence_detail__name">{{ competence!.name }}</h1>
@@ -120,7 +121,7 @@ function onScroll() {
                 />
                 <div class="competence_detail__details_list">
                     <CompetenceLevelCard
-                        :UELevel="competence!.levels.find((lvl) => lvl.level === selectedLevel)!"
+                        :skill-level="competence!.levels.find((lvl) => lvl.level === selectedLevel)!"
                         :level="selectedLevel"
                     />
                 </div>

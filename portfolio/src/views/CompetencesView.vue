@@ -1,22 +1,22 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
 import ToolCard from '@/components/ToolCard.vue'
-import type { UEModel } from '@/models/UEModel'
+import type { SkillModel } from '@/models/SkillModel'
 import { useToolsService } from '@/services/toolsService'
-import { useUEService } from '@/services/UEService'
+import { useSkillsService } from '@/services/SkillsService'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const ueService = useUEService()
+const ueService = useSkillsService()
 const toolsService = useToolsService()
-const competences = ref<UEModel[]>([])
+const competences = ref<SkillModel[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
     const tools = ref({} as {[key: string]: { name:string, displayName: string} []})
     onMounted(async function() {
         try {
-            competences.value = await ueService.getUEsTab()
+            competences.value = await ueService.getSkillTab()
             tools.value = await toolsService.getToolsData()
         } catch (e) {
             error.value = e instanceof Error ? e.message : 'Erreur de chargement'
@@ -25,7 +25,7 @@ const error = ref<string | null>(null)
         }
     })
     
-    function openDetail(competence: UEModel) {
+    function openDetail(competence: SkillModel) {
         router.push(`/competences/${competence.id}`)
     }
 </script>

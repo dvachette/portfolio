@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { UELevelModel } from '@/models/UELevelModel'
+import type { SkillLevelModel} from '@/models/SkillModel'
 interface CompetenceLevelProps {
-    UELevel: UELevelModel
+    skillLevel: SkillLevelModel
     level: number
 }
-const { UELevel } = defineProps<CompetenceLevelProps>()
+const { skillLevel } = defineProps<CompetenceLevelProps>()
 </script>
 <template>
     <div class="competence_level">
-        <h2 class="competence_level__title">Niveau {{ UELevel.level }}</h2>
+        <h2 class="competence_level__title">Niveau {{ skillLevel.level }}</h2>
         <h3>Apprentissages critiques</h3>
 
         <div
-            v-for="detail in UELevel.apprentissagesCritiques"
+            v-for="detail in skillLevel.details"
             :key="detail.id"
             class="competence_level__detail"
         >
