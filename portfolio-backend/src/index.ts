@@ -5,7 +5,7 @@ import { initBot } from './bot/client';
 import { rateLimiter } from './middlewares/rateLimiter';
 import { contactRouter } from './routes/contact';
 import { projectsRouter } from './routes/projects';
-import { uesRouter } from './routes/ues';
+import { uesRouter } from './routes/skills';
 import { toolsRouter } from './routes/tools';
 
 
@@ -23,7 +23,7 @@ app.use(express.json());
 app.use('/contact', rateLimiter);
 app.use('/contact', contactRouter);
 app.use('/projects', projectsRouter);
-app.use('/ues', uesRouter);
+app.use('/skills', uesRouter);
 app.use('/tools', toolsRouter);
 
 async function start(): Promise<void> {

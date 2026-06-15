@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { SkillModel } from '@/models/SkillModel'
 import CompetenceLevel from './CompetenceLevel.vue'
+const base = import.meta.env.BASE_URL;
 const { competence } = defineProps<{
     competence: SkillModel
 }>()
@@ -11,21 +12,24 @@ function selectCompetence() {
 </script>
 <template>
     <div class="competence_card" @click="selectCompetence">
-        <div class="competence_card__header">
-            <CompetenceLevel 
-                :level="competence.level" 
-                :max="competence.levels.length" 
-                :level_title="`Niveau ${ competence!.level }`"
-            />
-            <h3 class="competence_card__name">{{ competence.name }}</h3>
+        <div class="content_text">
+            <div class="competence_card__header">
+                <CompetenceLevel 
+                    :level="competence.level" 
+                    :max="competence.levels.length" 
+                    :level_title="competence.levels.find((l) => l.level === competence.level)!.levelName"
+                />
+                <h3 class="competence_card__name">{{ competence.name }}</h3>
+            </div>
+            <p class="competence_card__description">
+                {{
+                    competence.description.length > 100
+                        ? competence.description.substring(0, 100) + '...'
+                        : competence.description
+                }}
+            </p>            
         </div>
-        <p class="competence_card__description">
-            {{
-                competence.description.length > 100
-                    ? competence.description.substring(0, 100) + '...'
-                    : competence.description
-            }}
-        </p>
+        <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="Competence image" class="skill-img" />
     </div>
 </template>
 <style scoped>
@@ -36,8 +40,9 @@ function selectCompetence() {
     It should also have a box shadow to make it look like a card. The name of the competence should be bold and larger than the description. The description should be in a lighter color than the name.
     There should be some hover effect on the card, such as a slight increase in size and a change in background color. The card should be responsive and look good on different screen sizes.
  */
+
 .competence_card {
-    background-color: #3338;
+    background-color: #333c;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 0 20px 20px 20px;
@@ -45,7 +50,13 @@ function selectCompetence() {
         transform 0.2s,
         background-color 0.2s;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    max-width: 300px;
+    max-width: 100%;
+    display: flex;
+}
+.contect_text {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .competence_card__header {
     display: flex;
@@ -63,11 +74,25 @@ function selectCompetence() {
     margin-top: 10px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: bold;
-} /* Hover effect for larger screens */
+} 
+.skill-img {
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 5px;
+    /* make the image squared */
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+.competence_card__description_area {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+/* Hover effect for larger screens */
 @media (min-width: 600px) {
     .competence_card:hover {
         transform: scale(1.03);
-        background-color: #4448;
+        background-color: #444c;
     }
 }
 /* Fixed size and no hover effect for smaller screens */
@@ -78,7 +103,7 @@ function selectCompetence() {
     }
     .competence_card:hover {
         transform: none;
-        background-color: #3338;
+        background-color: #333c;
     }
 }
 </style>

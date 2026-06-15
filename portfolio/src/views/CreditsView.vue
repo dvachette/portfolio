@@ -32,9 +32,25 @@
         <p>Crédits supplémentaires :</p>
         <ul>
             <li>
-                <a href="https://www.flaticon.com/free-icons/error" title="error icons"
-                    >Error icons created by LAFS - Flaticon</a
-                >
+                <a href="https://www.flaticon.com/free-icons/error" title="error icons">Error icons created by LAFS - Flaticon</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/coding" title="coding icons">Coding icons created by juicy_fish - Flaticon</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/search-engine-optimisation" title="search engine optimisation icons">Search engine optimisation icons created by logisstudio - Flaticon</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/execution" title="execution icons">Execution icons created by kliwir art - Flaticon</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/data-source" title="data source icons">Data source icons created by Vectorslab - Flaticon</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/business-and-finance" title="business and finance icons">Business and finance icons created by Slamlabs - Flaticon</a>
+            </li>
+            <li>
+                <a href="https://www.flaticon.com/free-icons/code" title="code icons">Code icons created by juicy_fish - Flaticon</a>
             </li>
             <li>
                 <a

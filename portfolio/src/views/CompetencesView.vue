@@ -1,128 +1,213 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
-import ToolCard from '@/components/ToolCard.vue'
 import type { SkillModel } from '@/models/SkillModel'
-import { useToolsService } from '@/services/toolsService'
 import { useSkillsService } from '@/services/SkillsService'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const ueService = useSkillsService()
-const toolsService = useToolsService()
-const competences = ref<SkillModel[]>([])
+const competences = ref<{ section: string, icon: string, skills: SkillModel[] }[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-    const tools = ref({} as {[key: string]: { name:string, displayName: string} []})
-    onMounted(async function() {
-        try {
-            competences.value = await ueService.getSkillTab()
-            tools.value = await toolsService.getToolsData()
-        } catch (e) {
-            error.value = e instanceof Error ? e.message : 'Erreur de chargement'
-        } finally {
-            loading.value = false
-        }
-    })
-    
-    function openDetail(competence: SkillModel) {
-        router.push(`/competences/${competence.id}`)
+const activeSection = ref<string>('')
+let observer: IntersectionObserver
+
+function openDetail(competence: SkillModel): void {
+    router.push(`/competences/${competence.id}`)
+}
+
+function makeSlug(name: string): string {
+    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
+}
+const updateActive = (): void => {
+    const headings = Array.from(document.querySelectorAll('h2[id]'))
+
+    const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 10
+    if (isAtBottom) {
+        activeSection.value = headings[headings.length - 1]!.id
+        return
     }
+
+    let closest: string = ''
+    let closestDistance = Infinity
+
+    for (const heading of headings) {
+        const distance = Math.abs(heading.getBoundingClientRect().top - 120)
+        if (distance < closestDistance) {
+            closestDistance = distance
+            closest = heading.id
+        }
+    }
+
+    if (closest) {
+        activeSection.value = closest
+    }
+}
+
+onMounted(async function () {
+    try {
+        competences.value = await ueService.getSkillTab()
+        await nextTick()
+
+        const updateActive = (): void => {
+            const headings = Array.from(document.querySelectorAll('h2[id]'))
+
+            const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 10
+            if (isAtBottom) {
+                activeSection.value = headings[headings.length - 1]!.id
+                return
+            }
+
+            let closest: string = ''
+            let closestDistance = Infinity
+
+            for (const heading of headings) {
+                const distance = Math.abs(heading.getBoundingClientRect().top - 120)
+                if (distance < closestDistance) {
+                    closestDistance = distance
+                    closest = heading.id
+                }
+            }
+
+            if (closest) {
+                activeSection.value = closest
+            }
+        }
+
+        observer = new IntersectionObserver(updateActive, {
+            threshold: Array.from({ length: 21 }, (_, i) => i * 0.05)
+        })
+
+        document.querySelectorAll('h2[id]').forEach(el => observer.observe(el))
+        window.addEventListener('scroll', updateActive, { passive: true })
+    } catch (e) {
+        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
+    } finally {
+        loading.value = false
+    }
+})
+
+onUnmounted(() => {
+    observer?.disconnect()
+    window.removeEventListener('scroll', updateActive)
+})
+
+function scrollToSection(slug: string): void {
+    activeSection.value = slug
+}
 </script>
 
 <template>
-    <h1>Compétences du référentiel</h1>
-    <span v-if="error">{{ error }}</span>
-    <div v-else class="competences">
-        <CompetenceCard
-        v-for="competence in competences"
-        :key="competence.name"
-        :competence="competence"
-        @select="openDetail"
-        />
-    </div>
-    <h1>Langages, frameworks et outils</h1>
-    <details v-for="[category, languages] in Object.entries(tools)" :key="category">
-        <summary>{{ category }}</summary>
-        <div class="languages_content">
-            <ToolCard
-            v-for="tool in languages"
-            :key="tool.name"
-            :name="tool.name"
-            :displayName="tool.displayName"
-            />
+    <div class="page">
+        <nav class="sections-nav">
+            <a
+                v-for="section in competences"
+                :key="section.section"
+                :href="`#${makeSlug(section.section)}`"
+                :class="['sections-nav__item', { 'sections-nav__item--active': activeSection === makeSlug(section.section) }]"
+                :title="section.section"
+                @click="scrollToSection(makeSlug(section.section))"
+            >
+                <img :src="section.icon" :alt="section.section" />
+            </a>
+        </nav>
+
+        <div class="content">
+            <template v-for="section in competences" :key="section.section">
+                <h2 :id="makeSlug(section.section)">{{ section.section }}</h2>
+                <span v-if="error">{{ error }}</span>
+                <div v-else class="competences">
+                    <CompetenceCard
+                        v-for="competence in section.skills"
+                        :key="competence.name"
+                        :competence="competence"
+                        @select="openDetail"
+                    />
+                </div>
+            </template>
         </div>
-    </details>
+    </div>
     <RouterView />
 </template>
+
 <style scoped>
-h1 {
-    font-size: 2.5em;
+
+h2 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 2em;
     font-weight: bold;
     color: #eee;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-}
-.competences {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-}
-/* Flex column for smaller screens */
-@media (max-width: 600px) {
-    .competences {
-        flex-direction: column;
-        align-items: center;
-    }
-}
-.languages {
     margin-top: 2em;
 }
-.languages_content {
+
+.competences {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.page {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 1em;
+    flex-direction: row-reverse;
+    gap: 1rem;
 }
 
-details {
-    background-color: #3338;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 10px;
-    overflow: hidden;
-    transition: background-color 0.2s;
+.content {
+    flex: 1;
+    min-width: 0;
 }
 
-details[open] {
-    background-color: #4448;
+.sections-nav {
+    position: sticky;
+    top: 50%;
+    transform: translateY(-50%);
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 100;
+    background-color: #333c;
+    border-radius: 8px;
+    padding: 0.5rem 0.25rem;
+    height: fit-content;
+    backdrop-filter: blur(4px);
 }
 
-summary {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #eee;
-    padding: 14px 20px;
-    cursor: pointer;
-    list-style: none;
+.sections-nav__item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    user-select: none;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    opacity: 0.4;
+    transition: opacity 0.2s, border-color 0.2s;
 }
 
-summary::before {
-    content: '▶';
-    font-size: 0.75em;
-    color: #aaa;
-    transition: transform 0.2s;
+.sections-nav__item img {
+    width: 28px;
+    height: 28px;
+    filter: invert(1);
 }
 
-details[open] summary::before {
-    transform: rotate(90deg);
+.sections-nav__item:hover {
+    opacity: 0.8;
 }
 
-summary:hover {
-    color: #fff;
+.sections-nav__item--active {
+    opacity: 1;
+    border-color: var(--color-primary);
+}
+
+@media (max-width: 600px) {
+    .competences {
+        grid-template-columns: 1fr;
+    }
+
+    .sections-nav {
+        display: none;
+    }
 }
 </style>

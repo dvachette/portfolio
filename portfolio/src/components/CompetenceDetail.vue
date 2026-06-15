@@ -105,7 +105,7 @@ function onScroll() {
                     <CompetenceLevel
                         :level="competence!.level"
                         :max="competence!.levels.length"
-                        :level_title="`Niveau ${ competence!.level }`"
+                        :level_title="competence.levels.find((l) => l.level === competence!.level)!.levelName"
                         class="competence_level"
                     />
                     <h1 class="competence_detail__name">{{ competence!.name }}</h1>

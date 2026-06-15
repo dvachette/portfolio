@@ -33,3 +33,9 @@ main {
     z-index: -1;
 }
 </style>
+<style>
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
+</style>

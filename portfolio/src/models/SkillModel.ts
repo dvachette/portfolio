@@ -4,12 +4,14 @@ export interface SkillModel {
     description: string
     level: number
     levels: SkillLevelModel[]
+    image: string
 
 }
 
 export interface SkillLevelModel {
     level: number
     description: string
+    levelName: string
     details: SkillDetailModel[]
 }
 
