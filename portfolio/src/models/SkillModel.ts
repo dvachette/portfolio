@@ -5,6 +5,7 @@ export interface SkillModel {
     level: number
     levels: SkillLevelModel[]
     image: string
+    details: SkillDetailModel[]
 
 }
 

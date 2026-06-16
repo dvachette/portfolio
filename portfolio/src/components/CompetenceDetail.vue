@@ -116,7 +116,14 @@ function onScroll() {
                 <span class="close-button" @click="goBack">&Cross;</span>
             </div>
             <div class="competence_detail__content">
-                <p class="competence_detail__description">{{ competence!.description }}</p>
+                <div>
+                    <p class="competence_detail__description">{{ competence!.description }}</p>
+                    <ul class="competence_detail__explaination">
+                        <li v-for="(detail, index) in competence!.details" :key="index" class="competence_detail__explaination_item">
+                            {{ detail.name }}
+                        </li>
+                    </ul>
+                </div>
                 <img
                     v-if="competence!.image"
                     :src="competence!.image.startsWith('http') ? competence!.image : `${base}assets/${competence!.image}`"
@@ -252,7 +259,7 @@ h1 {
 }
 .competence_detail__description {
     font-size: 1.2em;
-    color: #aaa;
+    color: #bbb;
     margin: 20px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
@@ -297,6 +304,13 @@ h2 {
     transition: opacity 0.3s ease;
     animation: bounce 1.2s infinite ease-in-out;
 }
+.competence_detail__explaination {
+    list-style-type: disc;
+    padding-left: 40px;
+    color: #aaa;
+    font-size: 1.1em;
+}
+
 
 @keyframes bounce {
     0%,

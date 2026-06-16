@@ -50,7 +50,7 @@ header {
 }
 nav {
     display: flex;
-    gap: 1rem;
+    gap: 2rem;
 }
 .nav-link {
     display: inline-flex;
