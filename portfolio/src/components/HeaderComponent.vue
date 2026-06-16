@@ -85,7 +85,7 @@ nav {
     text-decoration: underline;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
     nav {
         justify-content: space-between;
         gap: 0.5rem;
