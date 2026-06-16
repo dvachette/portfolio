@@ -113,4 +113,14 @@ h1 {
 .credits li {
     margin: 0.5em 0;
 }
+@media (max-width: 800px) {
+    .credits {
+        width: 90%;
+        position: absolute;
+        top: 55%;
+        height: 80vh;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
 </style>
