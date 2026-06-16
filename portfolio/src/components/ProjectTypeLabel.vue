@@ -15,14 +15,14 @@ function hidePopup() {
 }
 </script>
 <template>
-    <div class="project_type" @mouseover="showPopup" @click="showPopup">
+    <div class="project_type" @mouseover="showPopup" @click="$event.stopPropagation();showPopup()">
         <img
             :src="`${base}assets/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`"
             alt="Type de projet"
             class="project_type_icon"
             :class="`project_type--${projectType}`"
         />
-        <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
+        <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="$event.stopPropagation();hidePopup()">
             <p v-if="projectType === 'Academic'">Projet scolaire</p>
             <p v-else-if="projectType === 'Personal'">Projet personnel</p>
             <p v-else>Type de projet inconnu</p>
