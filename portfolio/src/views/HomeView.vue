@@ -22,6 +22,8 @@
     color: #eee;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     cursor: default;
+    justify-self: center;
+    align-self: center;
 }
 .home h1 {
     font-size: 2.5em;
@@ -39,5 +41,13 @@ p {
     width: 80%;
     margin: 2em auto;
     cursor: default;
+}
+
+@media (max-width: 600px) {
+    p {
+        width: 80%;
+        font-size: 1.4em;
+        text-align: left;
+    }
 }
 </style>

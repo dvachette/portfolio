@@ -85,4 +85,19 @@ const base = import.meta.env.BASE_URL;
     margin: 2em auto;
     cursor: default;
 }
+@media (max-width: 600px) {
+    .content {
+        flex-direction: column-reverse;
+        align-items: center;
+    }
+    .text {
+        width: 90%;
+        font-size: 1.3em;
+        text-align: left;
+    }
+    h1 {
+        font-size: 2em;
+        width: 100%;
+    }
+}
 </style>

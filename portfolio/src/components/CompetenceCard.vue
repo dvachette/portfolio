@@ -93,6 +93,7 @@ function selectCompetence() {
     .competence_card:hover {
         transform: scale(1.03);
         background-color: #444c;
+        cursor: pointer;
     }
 }
 /* Fixed size and no hover effect for smaller screens */

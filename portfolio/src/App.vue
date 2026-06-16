@@ -17,6 +17,7 @@ import FloatingLines from '@/components/FloatingLines/FloatingLines.vue'
             id="lines"
         />
         <RouterView />
+        <div class="mobile-bg" />
     </main>
 </template>
 
@@ -31,6 +32,28 @@ main {
     width: 100%;
     height: 100%;
     z-index: -1;
+}
+.mobile-bg {
+  display: none;
+}
+
+@media (max-width: 600px) {
+    .mobile-bg {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(to bottom, #8905a3, #0057da);
+        z-index: -1;
+        pointer-events: none;
+    } 
+
+    main {
+        background: transparent;
+    }
+    #lines {
+        display: none;
+    }
+
 }
 </style>
 <style>

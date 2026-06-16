@@ -51,8 +51,7 @@ onMounted(async function () {
         await nextTick()
 
         const updateActive = (): void => {
-            const headings = Array.from(document.querySelectorAll('h2[id]'))
-
+            const headings = Array.from(document.querySelectorAll('h2[id]')) as HTMLElement[]
             const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 10
             if (isAtBottom) {
                 activeSection.value = headings[headings.length - 1]!.id
@@ -114,6 +113,7 @@ function scrollToSection(slug: string): void {
         </nav>
 
         <div class="content">
+            <h1>Compétences</h1>
             <template v-for="section in competences" :key="section.section">
                 <h2 :id="makeSlug(section.section)">{{ section.section }}</h2>
                 <span v-if="error">{{ error }}</span>
@@ -132,6 +132,13 @@ function scrollToSection(slug: string): void {
 </template>
 
 <style scoped>
+h1 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #eee;
+    margin-bottom: 1rem;
+}
 
 h2 {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -201,13 +208,24 @@ h2 {
     border-color: var(--color-primary);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1200px) {
+    .competences {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
     .competences {
         grid-template-columns: 1fr;
+        /* Add some margin between the cards */
+        gap: 1rem;
+        /* Center the cards */
+        justify-items: center;
     }
 
     .sections-nav {
         display: none;
     }
+
 }
 </style>
