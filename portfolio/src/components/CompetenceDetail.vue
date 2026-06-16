@@ -321,4 +321,33 @@ h2 {
         transform: translateY(6px);
     }
 }
+
+@media (max-width: 800px) {
+    .competence_detail {
+        width: 90vw;
+        height: 80vh;
+    }
+    .competence_detail__content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .competence_detail__content img {
+        margin-left: 0;
+        margin-top: 20px;
+    }
+}
+@media (max-width: 500px) {
+    .competence_detail {
+        width: 95vw;
+        height: 85vh;
+    }
+    .competence_detail__content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .competence_detail__content img {
+        margin-left: 0;
+        margin-top: 20px;
+    }
+}
 </style>

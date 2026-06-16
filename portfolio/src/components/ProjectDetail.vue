@@ -295,4 +295,17 @@ h1 {
         transform: translateY(6px);
     }
 }
+@media (max-width: 800px) {
+    .project-detail {
+        width: 90vw;
+        height: 80vh;
+    }
+    .project_detail__content {
+        flex-direction: column;
+    }
+    .project_detail_content__image {
+        width: 100%;
+        height: fit-content;
+    }
+}
 </style>

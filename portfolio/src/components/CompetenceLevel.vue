@@ -15,10 +15,10 @@ function hidePopup() {
 }
 </script>
 <template>
-    <div class="competence" @mouseover="showPopup" @click="showPopup">
+    <div class="competence" @mouseover="showPopup" @click="$event.stopPropagation();showPopup()">
         <div class="competence_level" :style="`background-color: hsl(${(level) * (100 / (max))}, 100%, 50%)`"></div>
     </div>
-    <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="hidePopup">
+    <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="$event.stopPropagation();hidePopup()">
         <p>{{ level_title }}</p>
     </div>
 </template>

@@ -81,15 +81,9 @@ function selectLevel(level: number) {
     transition: transform 0.1s;
 }
 /* Responsive design */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
     .progress_bar_fill {
-        width: 100px;
-    }
-    .progress_bar_label {
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-        font-size: 1em;
+        width: 20vw;
     }
 }
 </style>
