@@ -78,7 +78,7 @@ function goBack() {
     if (isClosing.value) return
     isClosing.value = true
     setTimeout(() => {
-        void router.push('/skills')
+        router.push({ name: 'default-skills'})
     }, CLOSE_ANIMATION_DURATION)
 }
 
@@ -151,7 +151,7 @@ function onScroll() {
                         v-for="project in projects"
                         :key="project.title"
                         :project="project"
-                        @select="(selectedProject) => router.push(`/projects/${selectedProject.id}`)"
+                        @select="(selectedProject) => router.push({ name: 'default-project-details', params: { id: selectedProject.id } })"
                     />
                 </div>
             </template> 

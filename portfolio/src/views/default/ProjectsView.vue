@@ -22,7 +22,7 @@ onMounted(async function() {
 })
 
 function selectProject(project: ProjectModel) {
-    router.push({ path: `/projects/${project.id}` })
+    router.push({ name: 'default-project-details', params: { id: project.id } })
 }
 </script>
 <template>

@@ -14,7 +14,7 @@ const activeSection = ref<string>('')
 let observer: IntersectionObserver
 
 function openDetail(competence: SkillModel): void {
-    router.push(`/skills/${competence.id}`)
+    router.push({ name: 'default-competence-details', params: { id: competence.id } })
 }
 
 function makeSlug(name: string): string {

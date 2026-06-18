@@ -20,14 +20,14 @@ app.use(cors({
 // });
 
 app.use(express.json());
-app.use('/contact', rateLimiter);
-app.use('/contact', contactRouter);
+//app.use('/contact', rateLimiter);
+//app.use('/contact', contactRouter);
 app.use('/projects', projectsRouter);
 app.use('/skills', uesRouter);
 app.use('/tools', toolsRouter);
 
 async function start(): Promise<void> {
-    await initBot();
+    //await initBot();
     app.listen(config.port, () => {
         console.log(`Server running on port ${config.port}`);
     });
