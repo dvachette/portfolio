@@ -62,12 +62,12 @@ function closeDetail() {
     if (isClosing.value) return
     isClosing.value = true
     setTimeout(() => {
-        void router.push({ name: 'projects' })
+        router.push({ name: 'default-projects' })
     }, CLOSE_ANIMATION_DURATION)
 }
 
 function goToCompetence(competence: SkillModel) {
-    router.push({ name: 'competence-details', params: { id: competence.id } })
+    router.push({ name: 'default-competence-details', params: { id: competence.id } })
 }
 
 function onScroll() {

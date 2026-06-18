@@ -1,17 +1,17 @@
 <script setup lang="ts">
 type NavItem = {
-    name: 'home' | 'me' | 'skills' | 'projects' | 'contact' | 'credits'
+    name: 'default-home' | 'default-me' | 'default-skills' | 'default-projects' | 'default-contact' | 'default-credits'
     label: string
     icon: string
 }
 
 const navItems: NavItem[] = [
-    { name: 'home', label: 'Accueil', icon: 'https://unpkg.com/lucide-static@latest/icons/home.svg' },
-    { name: 'me', label: 'À propos de moi', icon: 'https://unpkg.com/lucide-static@latest/icons/user-round.svg' },
-    { name: 'skills', label: 'Compétences', icon: 'https://unpkg.com/lucide-static@latest/icons/code-2.svg' },
-    { name: 'projects', label: 'Projets', icon: 'https://unpkg.com/lucide-static@latest/icons/folder-open.svg' },
-    { name: 'contact', label: 'Contact', icon: 'https://unpkg.com/lucide-static@latest/icons/mail.svg' },
-    { name: 'credits', label: 'Crédits', icon: 'https://unpkg.com/lucide-static@latest/icons/book-open-text.svg' },
+    { name: 'default-home', label: 'Accueil', icon: 'https://unpkg.com/lucide-static@latest/icons/home.svg' },
+    { name: 'default-me', label: 'À propos de moi', icon: 'https://unpkg.com/lucide-static@latest/icons/user-round.svg' },
+    { name: 'default-skills', label: 'Compétences', icon: 'https://unpkg.com/lucide-static@latest/icons/code-2.svg' },
+    { name: 'default-projects', label: 'Projets', icon: 'https://unpkg.com/lucide-static@latest/icons/folder-open.svg' },
+    { name: 'default-contact', label: 'Contact', icon: 'https://unpkg.com/lucide-static@latest/icons/mail.svg' },
+    { name: 'default-credits', label: 'Crédits', icon: 'https://unpkg.com/lucide-static@latest/icons/book-open-text.svg' },
 ]
 </script>
 <template>
@@ -20,24 +20,24 @@ const navItems: NavItem[] = [
             <RouterLink
                 v-for="item in navItems"
                 :key="item.name"
-                v-slot="{ href, navigate, isActive }"
+                v-slot="{ href, navigate, isActive, isExactActive }"
                 :to="{ name: item.name }"
                 custom
             >
-                <a
-                    :href="href"
-                    :class="['nav-link', { 'nav-link--active': isActive }]"
-                    :aria-label="item.label"
-                    :title="item.label"
-                    @click="navigate"
-                >
-                        <img :src="item.icon" alt="" aria-hidden="true" />
-
-                    <span class="nav-label">{{ item.label }}</span>
-                </a>
-            </RouterLink>
-        </nav>
-    </header>
+            <a
+                :href="href"
+                :class="['nav-link', { 'nav-link--active': item.name === 'default-home' ? isExactActive : isActive }]"
+                :aria-label="item.label"
+                :title="item.label"
+                @click="navigate"
+            >
+            <img :src="item.icon" alt="" aria-hidden="true" />
+            
+            <span class="nav-label">{{ item.label }}</span>
+        </a>
+    </RouterLink>
+</nav>
+</header>
 </template>
 <style scoped>
 header {
@@ -90,7 +90,7 @@ nav {
         justify-content: space-between;
         gap: 0.5rem;
     }
-
+    
     .nav-link {
         flex-direction: column;
         justify-content: center;
@@ -102,28 +102,28 @@ nav {
         text-decoration: none;
         opacity: 0.72;
     }
-
+    
     .nav-link svg {
         width: 1.35rem;
         height: 1.35rem;
     }
-
+    
     .nav-link img {
         width: 1.35rem;
         height: 1.35rem;
         filter: brightness(0) invert(1);
     }
-
+    
     .nav-label {
         display: none;
         white-space: nowrap;
     }
-
+    
     .nav-link--active {
         opacity: 1;
         text-decoration: none;
     }
-
+    
     .nav-link--active .nav-label {
         display: block;
         font-size: 0.72rem;
