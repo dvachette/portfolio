@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import AppBar from '@/components/kde/AppBar.vue';
+import KDEApp from '@/components/kde/KDEApp.vue';
+import { useKdeWindowsStore } from '@/stores/kde/appsStore';
 
+const store = useKdeWindowsStore();
 </script>
-
 
 <template>
     <main class="kde-layout">
-        <h1 class="kde-layout__title">KDE Layout</h1>
+        <KDEApp
+            v-for="app in store.windows"
+            v-show="!app.minimized"
+            :key="app.metaData.id"
+            v-model="store.windows[store.windows.indexOf(app)]!"
+        />
     </main>
     <AppBar />
 </template>
 <style scoped lang="scss">
 .kde-layout {
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;

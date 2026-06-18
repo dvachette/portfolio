@@ -1,29 +1,39 @@
 <script setup lang="ts">
-import type { AppBarIcon } from '@/types/kde/appBar';
 import AppIcon from './AppIcon.vue';
+import { useKdeWindowsStore } from '@/stores/kde/appsStore';
 
-const apps: AppBarIcon[] = [
-    { id: 'kde-home', name: 'Accueil', icon: 'https://unpkg.com/lucide-static@latest/icons/home.svg' },
-    { id: 'kde-me', name: 'À propos de moi', icon: 'https://unpkg.com/lucide-static@latest/icons/user-round.svg' },
-    { id: 'kde-skills', name: 'Compétences', icon: 'https://unpkg.com/lucide-static@latest/icons/code-2.svg' },
-    { id: 'kde-projects', name: 'Projets', icon: 'https://unpkg.com/lucide-static@latest/icons/folder-open.svg' },
-    { id: 'kde-contact', name: 'Contact', icon: 'https://unpkg.com/lucide-static@latest/icons/mail.svg' },
-    { id: 'kde-credits', name: 'Crédits', icon: 'https://unpkg.com/lucide-static@latest/icons/book-open-text.svg' },
-]
-function handleAppClick(appId: string) {
-    console.log(`App clicked: ${appId}`);
+const store = useKdeWindowsStore();
+
+function handleAppClick(appId: string): void {
+    const win = store.windows.find(w => w.metaData.id === appId);
+    if (!win) return;
+
+    if (win.minimized) {
+        store.unminimize(appId);
+        return;
+    }
+
+    const maxZ = store.windows.reduce((acc, w) => Math.max(acc, w.zIndex), 0);
+    if (win.zIndex === maxZ) {
+        store.minimize(appId);
+    } else {
+        store.focus(appId);
+    }
 }
 </script>
+
 <template>
     <div class="app-bar">
         <AppIcon
-            v-for="app in apps"
-            :key="app.id"
-            :app="app"
+            v-for="app in store.windows"
+            :key="app.metaData.id"
+            :app="app.metaData"
+            :minimized="app.minimized"
             @appClicked="handleAppClick"
         />
     </div>
 </template>
+
 <style scoped lang="scss">
 .app-bar {
     display: flex;
