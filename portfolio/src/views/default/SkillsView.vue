@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CompetenceCard from '@/components/CompetenceCard.vue'
+import CompetenceCard from '@/components/default/CompetenceCard.vue'
 import type { SkillModel } from '@/models/SkillModel'
 import { useSkillsService } from '@/services/SkillsService'
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
@@ -14,7 +14,7 @@ const activeSection = ref<string>('')
 let observer: IntersectionObserver
 
 function openDetail(competence: SkillModel): void {
-    router.push(`/competences/${competence.id}`)
+    router.push(`/skills/${competence.id}`)
 }
 
 function makeSlug(name: string): string {

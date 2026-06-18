@@ -1,61 +1,61 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import CompetencesView from '@/views/CompetencesView.vue'
-import ProjectsView from '@/views/ProjectsView.vue'
-import ContactView from '@/views/ContactView.vue'
-import ProjectDetails from '@/components/ProjectDetail.vue'
-import CreditsView from '@/views/CreditsView.vue'
-import CompetenceDetail from '@/components/CompetenceDetail.vue'
-import MeView from '@/views/MeView.vue'
+import DefaultHomeView from '@/views/default/HomeView.vue'
+import DefaultSkillView from '@/views/default/SkillsView.vue'
+import DefaultProjectsView from '@/views/default/ProjectsView.vue'
+import DefaultContactView from '@/views/default/ContactView.vue'
+import DefaultProjectDetails from '@/components/default/ProjectDetail.vue'
+import DefaultCreditsView from '@/views/default/CreditsView.vue'
+import DefaultCompetenceDetail from '@/components/default/CompetenceDetail.vue'
+import DefaultMeView from '@/views/default/MeView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {
-            path: '/',
+            path: '/default/',
             name: 'home',
-            component: HomeView,
+            component: DefaultHomeView,
         },
         {
-            path: '/competences',
-            name: 'competences',
-            component: CompetencesView,
+            path: '/default/skills',
+            name: 'skills',
+            component: DefaultSkillView,
             children: [
                 {
                     path: ':id',
                     name: 'competence-details',
-                    component: CompetenceDetail,
+                    component: DefaultCompetenceDetail,
                     props: true,
                 },
             ],
         },
         {
-            path: '/projects',
+            path: '/default/projects',
             name: 'projects',
-            component: ProjectsView,
+            component: DefaultProjectsView,
             children: [
                 {
                     path: ':id',
                     name: 'project-details',
-                    component: ProjectDetails,
+                    component: DefaultProjectDetails,
                     props: true,
                 },
             ],
         },
         {
-            path: '/contact',
+            path: '/default/contact',
             name: 'contact',
-            component: ContactView,
+            component: DefaultContactView,
         },
         {
-            path: '/credits',
+            path: '/default/credits',
             name: 'credits',
-            component: CreditsView,
+            component: DefaultCreditsView,
         },
         {
-            path: '/me',
+            path: '/default/me',
             name: 'me',
-            component: MeView,
+            component: DefaultMeView,
         },
     ],
 })

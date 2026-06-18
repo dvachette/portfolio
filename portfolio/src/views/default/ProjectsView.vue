@@ -2,7 +2,7 @@
 import { useProjectService } from '@/services/ProjectService'
 import { ref, onMounted } from 'vue'
 import type { ProjectModel } from '@/models/ProjectModel'
-import ProjectCard from '@/components/ProjectCard.vue'
+import ProjectCard from '@/components/default/ProjectCard.vue'
 import { useRouter } from 'vue-router'
 
 const projectService = useProjectService()

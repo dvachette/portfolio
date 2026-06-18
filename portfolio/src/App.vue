@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import HeaderComponent from '@/components/HeaderComponent.vue'
-import FloatingLines from '@/components/FloatingLines/FloatingLines.vue'
+import HeaderComponent from '@/components/default/HeaderComponent.vue'
+import FloatingLines from '@/components/default/FloatingLines/FloatingLines.vue'
 </script>
 
 <template>

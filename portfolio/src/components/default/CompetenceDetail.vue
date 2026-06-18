@@ -78,7 +78,7 @@ function goBack() {
     if (isClosing.value) return
     isClosing.value = true
     setTimeout(() => {
-        void router.push('/competences')
+        void router.push('/skills')
     }, CLOSE_ANIMATION_DURATION)
 }
 
