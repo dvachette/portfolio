@@ -69,6 +69,11 @@ const router = createRouter({
                 },
             ],
         },
+        {
+            path: '/kde',
+            name: 'kde',
+            component: () => import('@/views/kde/KDELayout.vue'),
+        }
     ],
 })
 
