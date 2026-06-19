@@ -4,6 +4,7 @@ import type { SkillModel } from '@/models/SkillModel'
 import { useSkillsService } from '@/services/SkillsService'
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useLangStore } from '@/stores/langStore'
 
 const router = useRouter()
 const ueService = useSkillsService()
@@ -12,6 +13,7 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const activeSection = ref<string>('')
 let observer: IntersectionObserver
+const texts = useLangStore().texts
 
 function openDetail(competence: SkillModel): void {
     router.push({ name: 'default-competence-details', params: { id: competence.id } })
@@ -113,7 +115,7 @@ function scrollToSection(slug: string): void {
         </nav>
 
         <div class="content">
-            <h1>Compétences</h1>
+            <h1>{{ texts.skills.title }}</h1>
             <template v-for="section in competences" :key="section.section">
                 <h2 :id="makeSlug(section.section)">{{ section.section }}</h2>
                 <span v-if="error">{{ error }}</span>

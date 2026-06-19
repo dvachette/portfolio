@@ -1,19 +1,15 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useLangStore } from '@/stores/langStore';
+const texts = useLangStore().texts;
+</script>
 <template>
     <div class="home">
-        <h1>Bienvenue sur mon portfolio !</h1>
+        <h1>{{texts.home.title}}</h1>
         <p>
-            Passionné d'informatique, je suis étudiant en informatique à l'IUT de Lyon. Je me
-            spécialise dans le développement d'applications, et me forme à tous les aspects du
-            développement logiciel, du web au systèmes d'exploitation, en passant par les bases de
-            données et les réseaux.
+            {{texts.home.content.p1}}
             <br />
             <br />
-            J'aime me former à utiliser de nouvelles technologies et relever des défis techniques.
-            Sur ce portfolio, vous trouverez une sélection de mes projets personnels et
-            professionnels, ainsi que les compétences que j'ai acquises au fil de mes expériences.
-            N'hésitez pas à me contacter pour discuter de mes projets ou de toute opportunité de
-            collaboration !
+            {{texts.home.content.p2}}
         </p>
     </div>
 </template>

@@ -1,0 +1,35 @@
+{
+    "home": {
+        "name": "Accueil",
+        "title": "Bienvenue sur mon portfolio !",
+        "content": {
+            "p1": "Passionné d'informatique, je suis étudiant en informatique à l'IUT de Lyon. Je me spécialise dans le développement d'applications, et me forme à tous les aspects du développement logiciel, du web au systèmes d'exploitation, en passant par les bases de données et les réseaux.",
+            "p2": "J'aime me former à utiliser de nouvelles technologies et relever des défis techniques. Sur ce portfolio, vous trouverez une sélection de mes projets personnels et professionnels, ainsi que les compétences que j'ai acquises au fil de mes expériences. N'hésitez pas à me contacter pour discuter de mes projets ou de toute opportunité de collaboration ! "
+        }
+    },
+    "about": {
+        "name": "À propos de moi",
+        "title": "À propos de moi",
+        "content": {
+            "p1": "Étudiant à l'IUT de Lyon 1 en informatique, je suis passionné par le développement web et les technologies modernes. J'aime créer des applications fonctionnelles et esthétiques, tout en apprenant constamment de nouvelles compétences pour rester à jour dans ce domaine en constante évolution.",
+            "p2": " Je m'intéresse également à l'informatique à bas niveau, que ce soit au niveau du matériel ou du système d'exploitation, dans une optique de compréhension globale du fonctionnement de mes outils, ainsi que pour pouvoir mettre en œuvre des installations personnalisées et finement adaptées à mes besoins.",
+            "p3": " Fervent défenseur de l'open source, je crois en la collaboration et au partage des connaissances pour faire avancer la technologie et créer des solutions innovantes. C'est cet état d'esprit qui me pousse à privilégier l'utilisation d'outils open source comme par exemple Debian, que j'utilise au quotidien.",
+            "p4": " Ancien vice-trésorier et chargé de mission prévention au sein du BDE de mon IUT, j'ai développé des compétences en gestion d'équipe, organisation d'événements et gestion de crise, que je considère comme des atouts précieux pour ma future carrière professionnelle. J'ai a travers cet engagement pu mettre en pratique mes compétences techniques et humaines au service des étudiants de mon IUT. L'engagement associatif m'a aussi conduit a suivre des formations de secourisem en santé mentale, en gestion de crise et en prévention des risques psychosociaux, qui m'ont permis d'acquérir des compétences précieuses en matière de gestion de situations difficiles et de soutien aux personnes en détresse.",
+            "image_alt": "Photo de moi"
+        }
+    },
+    "skills": {
+        "name": "Compétences",
+        "title": "Compétences",
+        "details": {
+
+        }
+    },
+    "projects": {
+        "name": "Projets",
+        "title": "Mes projets",
+        "details": {
+
+        }
+    }
+}

@@ -1,3 +1,5 @@
 <template>
-    <h1>Welcome home</h1>
+    <h1>Bienvenue !</h1>
+    <cite>Hello, Gutten Tag, Bonjour</cite>
+    <p>Bienvenue sur mon portfolio !</p>
 </template>

@@ -4,12 +4,14 @@ import { ref, onMounted } from 'vue'
 import type { ProjectModel } from '@/models/ProjectModel'
 import ProjectCard from '@/components/default/ProjectCard.vue'
 import { useRouter } from 'vue-router'
+import { useLangStore } from '@/stores/langStore'
 
 const projectService = useProjectService()
 const projects = ref<ProjectModel[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const router = useRouter()
+const texts = useLangStore().texts
 
 onMounted(async function() {
     try {
@@ -26,7 +28,7 @@ function selectProject(project: ProjectModel) {
 }
 </script>
 <template>
-    <h1>Mes projets</h1>
+    <h1>{{ texts.projects.title }}</h1>
     <span v-if="error">{{ error }}</span>
     <div v-else class="projects-list">
         <ProjectCard
