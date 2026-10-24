@@ -5,6 +5,9 @@ on:
       - main
     paths:
       - "portfolio/**"
+      - "portfolio-backend/**"
+      - "docker-compose.yml"
+
 
 jobs:
   deploy:
@@ -19,4 +22,5 @@ jobs:
           script: |
             cd /home/debian/portfolio
             git pull
-            docker compose up -d --build
+            docker compose build --pull
+            docker compose up -d
