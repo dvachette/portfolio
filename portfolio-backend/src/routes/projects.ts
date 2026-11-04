@@ -1,12 +1,16 @@
 import { Router, Request, Response } from 'express';
 import { readJSON } from '../data/readers';
+import { ProjectReaderModel } from '../models/ProjectReaderModel';
+import { SkillSectionReaderModel } from '../models/SkillSectionReaderModel';
+import { ProjectModel } from '../models/ProjectModel';
+
 
 export const projectsRouter = Router();
 
-async function resolveProjects(): Promise<any[]> {
+async function resolveProjects(): Promise<ProjectModel[]> {
   const [projects, skills] = await Promise.all([
-    readJSON<any[]>('projects.json'),
-    readJSON<any[]>('skills.json'),
+    readJSON<ProjectReaderModel[]>('projects.json'),
+    readJSON<SkillSectionReaderModel[]>('skills.json'),
   ]);
   return projects.map((project) => ({
     ...project,
@@ -18,6 +22,7 @@ async function resolveProjects(): Promise<any[]> {
         level: 3,
         levels: [],
         details: [],
+        image: 'https://placehold.co/100x100'
       }
     ),
   }));
