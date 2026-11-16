@@ -8,6 +8,9 @@ import { projectsRouter } from './routes/projects';
 import { uesRouter } from './routes/skills';
 import { careerRouter } from './routes/career';
 import { interestsRouter } from './routes/interests';
+import { adminRouter } from './routes/admin';
+import { requireAdminToken } from './middlewares/adminAuth';
+import { errorHandler } from './middlewares/errorHandler';
 
 
 const app = express();
@@ -20,6 +23,9 @@ app.use(cors({
 //     setTimeout(next, 1000);
 // });
 
+// Admin API: token checked before parsing the body; larger limit because skills.json is ~200 kB
+app.use('/admin', requireAdminToken, express.json({ limit: '1mb' }), adminRouter);
+
 app.use(express.json());
 app.use('/contact', rateLimiter);
 app.use('/contact', contactRouter);
@@ -27,6 +33,7 @@ app.use('/projects', projectsRouter);
 app.use('/skills', uesRouter);
 app.use('/career', careerRouter);
 app.use('/interests', interestsRouter);
+app.use(errorHandler);
 
 async function start(): Promise<void> {
     await initBot();

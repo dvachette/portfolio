@@ -1,0 +1,1306 @@
+openapi: 3.1.0
+info:
+  title: API du portfolio dvachette.fr
+  version: 1.0.0
+  description: |
+    API du backend du portfolio.
+
+    - **Routes publiques** : lecture des données affichées sur le site et formulaire de contact.
+    - **Routes `/admin/*`** : édition des fichiers de données (`data/*.json`), réservées au backend
+      du panel admin. Elles exigent l'en-tête `Authorization: Bearer <ADMIN_API_TOKEN>` et sont
+      désactivées (`503`) si `ADMIN_API_TOKEN` n'est pas configuré.
+
+    Toutes les erreurs ont la forme `{ "error": "<message>" }`.
+
+servers:
+  - url: https://api.dvachette.fr
+    description: Production (public)
+  - url: http://127.0.0.1:3003
+    description: Production, accès local depuis le VPS (utilisé par le panel admin)
+  - url: http://localhost:3000
+    description: Développement
+
+tags:
+  - name: Public
+    description: Lecture des données du site
+  - name: Contact
+  - name: Admin - Projets
+  - name: Admin - Compétences
+  - name: Admin - Parcours
+    description: Expériences, formations et certifications
+  - name: Admin - Centres d'intérêt
+
+paths:
+  # ------------------------------------------------------------------ Public
+  /projects:
+    get:
+      tags: [Public]
+      summary: Liste des projets
+      description: Les identifiants de compétences sont résolus en objets `Skill` complets.
+      operationId: listProjects
+      responses:
+        '200':
+          description: Projets
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ResolvedProject' }
+
+  /projects/{id}:
+    get:
+      tags: [Public]
+      summary: Détail d'un projet
+      description: |
+        Si le projet n'existe pas, la réponse est quand même `200` avec un projet de substitution
+        (`id: "unknown"`, `title: "Projet non trouvé"`).
+      operationId: getProject
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Projet (ou projet de substitution)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResolvedProject' }
+
+  /projects/by-competence/{competenceId}:
+    get:
+      tags: [Public]
+      summary: Projets mobilisant une compétence
+      operationId: listProjectsByCompetence
+      parameters:
+        - name: competenceId
+          in: path
+          required: true
+          schema: { type: string }
+          example: realiser
+      responses:
+        '200':
+          description: Projets (liste vide si aucun)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ResolvedProject' }
+
+  /skills:
+    get:
+      tags: [Public]
+      summary: Compétences, groupées par section
+      operationId: listSkillSections
+      responses:
+        '200':
+          description: Sections de compétences
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SkillSection' }
+
+  /skills/{id}:
+    get:
+      tags: [Public]
+      summary: Détail d'une compétence
+      description: |
+        Recherche dans toutes les sections. Si la compétence n'existe pas, la réponse est quand même
+        `200` avec une compétence de substitution (`id: "not-found"`).
+      operationId: getSkill
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Compétence (ou compétence de substitution)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Skill' }
+
+  /career:
+    get:
+      tags: [Public]
+      summary: Parcours (page CV)
+      description: |
+        Expériences et formations triées de la plus récente à la plus ancienne
+        (les éléments en cours, `endDate: null`, en premier).
+      operationId: getCareer
+      responses:
+        '200':
+          description: Parcours
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Career' }
+
+  /interests:
+    get:
+      tags: [Public]
+      summary: Centres d'intérêt
+      operationId: listInterests
+      responses:
+        '200':
+          description: Centres d'intérêt
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Interest' }
+
+  /contact:
+    post:
+      tags: [Contact]
+      summary: Envoyer un message de contact
+      description: Le message est transmis en message privé Discord. Limité à 5 requêtes par 15 minutes.
+      operationId: sendContactMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, message]
+              properties:
+                name: { type: string }
+                email: { type: string }
+                message: { type: string }
+      responses:
+        '200':
+          description: Message envoyé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, const: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429':
+          description: Trop de requêtes
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  # ------------------------------------------------------------------ Admin: projects
+  /admin/projects:
+    get:
+      tags: [Admin - Projets]
+      summary: Liste des projets (format brut)
+      operationId: adminListProjects
+      security: [{ adminToken: [] }]
+      responses:
+        '200':
+          description: Projets, compétences sous forme d'identifiants
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Project' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    post:
+      tags: [Admin - Projets]
+      summary: Créer un projet
+      description: Toutes les compétences référencées dans `competences` doivent exister.
+      operationId: adminCreateProject
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Project' }
+      responses:
+        '201': { $ref: '#/components/responses/ProjectOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/projects/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Admin - Projets]
+      summary: Détail d'un projet (format brut)
+      operationId: adminGetProject
+      security: [{ adminToken: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/ProjectOk' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    put:
+      tags: [Admin - Projets]
+      summary: Remplacer un projet
+      operationId: adminReplaceProject
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProjectInput' }
+      responses:
+        '200': { $ref: '#/components/responses/ProjectOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    patch:
+      tags: [Admin - Projets]
+      summary: Modifier partiellement un projet
+      operationId: adminUpdateProject
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProjectPatch' }
+      responses:
+        '200': { $ref: '#/components/responses/ProjectOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Projets]
+      summary: Supprimer un projet
+      operationId: adminDeleteProject
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Projet supprimé }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  # ------------------------------------------------------------------ Admin: skills
+  /admin/skills:
+    get:
+      tags: [Admin - Compétences]
+      summary: Liste des sections et de leurs compétences
+      operationId: adminListSkillSections
+      security: [{ adminToken: [] }]
+      responses:
+        '200':
+          description: Sections, dans l'ordre de `skills.json` (l'index sert d'identifiant)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/SkillSection' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    post:
+      tags: [Admin - Compétences]
+      summary: Créer une section
+      description: |
+        La section est ajoutée en fin de liste. `skills` est optionnel (liste vide par défaut) ;
+        les identifiants de compétences doivent rester uniques sur l'ensemble des sections.
+      operationId: adminCreateSkillSection
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SkillSectionInput' }
+      responses:
+        '201': { $ref: '#/components/responses/SkillSectionOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/skills/{section}:
+    parameters:
+      - $ref: '#/components/parameters/SectionIndex'
+    patch:
+      tags: [Admin - Compétences]
+      summary: Modifier le nom ou l'icône d'une section
+      description: Le champ `skills` est refusé ici ; utiliser les routes `/admin/skills/{section}/skills`.
+      operationId: adminUpdateSkillSection
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SkillSectionPatch' }
+      responses:
+        '200': { $ref: '#/components/responses/SkillSectionOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Compétences]
+      summary: Supprimer une section
+      description: |
+        Refusé (`409`) si une de ses compétences est encore utilisée par un projet.
+        Les sections suivantes sont décalées d'un index.
+      operationId: adminDeleteSkillSection
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Section supprimée }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/skills/{section}/skills:
+    parameters:
+      - $ref: '#/components/parameters/SectionIndex'
+    post:
+      tags: [Admin - Compétences]
+      summary: Ajouter une compétence à une section
+      description: Refusé (`409`) si l'identifiant existe déjà dans n'importe quelle section.
+      operationId: adminCreateSkill
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Skill' }
+      responses:
+        '201': { $ref: '#/components/responses/SkillOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/skills/{section}/skills/{id}:
+    parameters:
+      - $ref: '#/components/parameters/SectionIndex'
+      - $ref: '#/components/parameters/Id'
+    put:
+      tags: [Admin - Compétences]
+      summary: Remplacer une compétence
+      operationId: adminReplaceSkill
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SkillInput' }
+      responses:
+        '200': { $ref: '#/components/responses/SkillOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    patch:
+      tags: [Admin - Compétences]
+      summary: Modifier partiellement une compétence
+      operationId: adminUpdateSkill
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SkillPatch' }
+      responses:
+        '200': { $ref: '#/components/responses/SkillOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Compétences]
+      summary: Supprimer une compétence
+      description: Refusé (`409`) si la compétence est encore utilisée par un projet.
+      operationId: adminDeleteSkill
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Compétence supprimée }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  # ------------------------------------------------------------------ Admin: career
+  /admin/experiences:
+    get:
+      tags: [Admin - Parcours]
+      summary: Liste des expériences (ordre du fichier)
+      operationId: adminListExperiences
+      security: [{ adminToken: [] }]
+      responses:
+        '200':
+          description: Expériences
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Experience' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    post:
+      tags: [Admin - Parcours]
+      summary: Créer une expérience
+      operationId: adminCreateExperience
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Experience' }
+      responses:
+        '201': { $ref: '#/components/responses/ExperienceOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/experiences/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Admin - Parcours]
+      summary: Détail d'une expérience
+      operationId: adminGetExperience
+      security: [{ adminToken: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/ExperienceOk' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    put:
+      tags: [Admin - Parcours]
+      summary: Remplacer une expérience
+      operationId: adminReplaceExperience
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExperienceInput' }
+      responses:
+        '200': { $ref: '#/components/responses/ExperienceOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    patch:
+      tags: [Admin - Parcours]
+      summary: Modifier partiellement une expérience
+      operationId: adminUpdateExperience
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExperiencePatch' }
+      responses:
+        '200': { $ref: '#/components/responses/ExperienceOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Parcours]
+      summary: Supprimer une expérience
+      operationId: adminDeleteExperience
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Expérience supprimée }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/education:
+    get:
+      tags: [Admin - Parcours]
+      summary: Liste des formations (ordre du fichier `formations.json`)
+      operationId: adminListEducation
+      security: [{ adminToken: [] }]
+      responses:
+        '200':
+          description: Formations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Education' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    post:
+      tags: [Admin - Parcours]
+      summary: Créer une formation
+      operationId: adminCreateEducation
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Education' }
+      responses:
+        '201': { $ref: '#/components/responses/EducationOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/education/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Admin - Parcours]
+      summary: Détail d'une formation
+      operationId: adminGetEducation
+      security: [{ adminToken: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/EducationOk' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    put:
+      tags: [Admin - Parcours]
+      summary: Remplacer une formation
+      operationId: adminReplaceEducation
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EducationInput' }
+      responses:
+        '200': { $ref: '#/components/responses/EducationOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    patch:
+      tags: [Admin - Parcours]
+      summary: Modifier partiellement une formation
+      operationId: adminUpdateEducation
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EducationPatch' }
+      responses:
+        '200': { $ref: '#/components/responses/EducationOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Parcours]
+      summary: Supprimer une formation
+      operationId: adminDeleteEducation
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Formation supprimée }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/certifications:
+    get:
+      tags: [Admin - Parcours]
+      summary: Liste des formations complémentaires
+      operationId: adminListCertifications
+      security: [{ adminToken: [] }]
+      responses:
+        '200':
+          description: Certifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Certification' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    post:
+      tags: [Admin - Parcours]
+      summary: Créer une formation complémentaire
+      operationId: adminCreateCertification
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Certification' }
+      responses:
+        '201': { $ref: '#/components/responses/CertificationOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/certifications/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Admin - Parcours]
+      summary: Détail d'une formation complémentaire
+      operationId: adminGetCertification
+      security: [{ adminToken: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/CertificationOk' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    put:
+      tags: [Admin - Parcours]
+      summary: Remplacer une formation complémentaire
+      operationId: adminReplaceCertification
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CertificationInput' }
+      responses:
+        '200': { $ref: '#/components/responses/CertificationOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    patch:
+      tags: [Admin - Parcours]
+      summary: Modifier partiellement une formation complémentaire
+      operationId: adminUpdateCertification
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CertificationPatch' }
+      responses:
+        '200': { $ref: '#/components/responses/CertificationOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Parcours]
+      summary: Supprimer une formation complémentaire
+      operationId: adminDeleteCertification
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Formation complémentaire supprimée }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  # ------------------------------------------------------------------ Admin: interests
+  /admin/interests:
+    get:
+      tags: [Admin - Centres d'intérêt]
+      summary: Liste des centres d'intérêt
+      operationId: adminListInterests
+      security: [{ adminToken: [] }]
+      responses:
+        '200':
+          description: Centres d'intérêt
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Interest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    post:
+      tags: [Admin - Centres d'intérêt]
+      summary: Créer un centre d'intérêt
+      operationId: adminCreateInterest
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Interest' }
+      responses:
+        '201': { $ref: '#/components/responses/InterestOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+  /admin/interests/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Admin - Centres d'intérêt]
+      summary: Détail d'un centre d'intérêt
+      operationId: adminGetInterest
+      security: [{ adminToken: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/InterestOk' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    put:
+      tags: [Admin - Centres d'intérêt]
+      summary: Remplacer un centre d'intérêt
+      operationId: adminReplaceInterest
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InterestInput' }
+      responses:
+        '200': { $ref: '#/components/responses/InterestOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    patch:
+      tags: [Admin - Centres d'intérêt]
+      summary: Modifier partiellement un centre d'intérêt
+      operationId: adminUpdateInterest
+      security: [{ adminToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InterestPatch' }
+      responses:
+        '200': { $ref: '#/components/responses/InterestOk' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+    delete:
+      tags: [Admin - Centres d'intérêt]
+      summary: Supprimer un centre d'intérêt
+      operationId: adminDeleteInterest
+      security: [{ adminToken: [] }]
+      responses:
+        '204': { description: Centre d'intérêt supprimé }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/AdminDisabled' }
+
+components:
+  securitySchemes:
+    adminToken:
+      type: http
+      scheme: bearer
+      description: |
+        Jeton partagé `ADMIN_API_TOKEN` (au moins 32 caractères, générer avec `openssl rand -hex 32`).
+        À configurer à l'identique dans le `.env` du backend du portfolio et dans celui du panel admin.
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Identifiant de l'élément. Pour `PUT` et `PATCH`, c'est lui qui fait foi (un `id` dans le corps est ignoré).
+      schema: { type: string }
+    SectionIndex:
+      name: section
+      in: path
+      required: true
+      description: Position (à partir de 0) de la section dans `skills.json` ; les sections n'ont pas d'identifiant.
+      schema: { type: integer, minimum: 0 }
+      example: 0
+
+  responses:
+    BadRequest:
+      description: Corps invalide (JSON mal formé, champ manquant, inconnu ou de mauvais type)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: 'body.startDate must be a date formatted as YYYY-MM-DD' }
+    Unauthorized:
+      description: Jeton absent ou invalide
+      headers:
+        WWW-Authenticate:
+          schema: { type: string, const: Bearer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: Unauthorized }
+    NotFound:
+      description: Élément introuvable
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: 'No item with id "jsnake" in projects' }
+    Conflict:
+      description: Conflit d'intégrité (identifiant déjà utilisé, compétence inconnue ou encore référencée)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: 'Skill(s) still used by project(s): jsnake' }
+    AdminDisabled:
+      description: API d'administration désactivée (`ADMIN_API_TOKEN` non configuré)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ProjectOk:
+      description: Projet
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Project' }
+    SkillSectionOk:
+      description: Section
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/SkillSection' }
+    SkillOk:
+      description: Compétence
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Skill' }
+    ExperienceOk:
+      description: Expérience
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Experience' }
+    EducationOk:
+      description: Formation
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Education' }
+    CertificationOk:
+      description: Formation complémentaire
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Certification' }
+    InterestOk:
+      description: Centre d'intérêt
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Interest' }
+
+  schemas:
+    # Conventions (identiques à la validation du backend) :
+    # - aucune propriété supplémentaire n'est acceptée ;
+    # - les chaînes ne peuvent pas être vides ;
+    # - *Fields = champs communs (ouvert), X = élément complet, *Input = corps de PUT (id ignoré),
+    #   *Patch = corps de PATCH (tout optionnel ; `null` sur un champ optionnel le supprime).
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+
+    NonEmptyString:
+      type: string
+      minLength: 1
+      pattern: '\S'
+    Date:
+      type: string
+      format: date
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+      example: '2026-04-07'
+
+    ProjectType:
+      type: string
+      enum: [Personal, Academic]
+    ProgrammingLanguage:
+      type: string
+      enum: [TypeScript, JavaScript, Python, Java, 'C#', 'C++', PHP, Kotlin, Assembly, C, Vue, React, Angular, Bash, HTML/CSS, SQL]
+    ExperienceType:
+      type: string
+      enum: [job, internship, association]
+      description: '`job` emploi, `internship` stage, `association` engagement associatif'
+    Workload:
+      type: string
+      enum: [full-time, part-time, volunteer]
+
+    Organization:
+      type: object
+      additionalProperties: false
+      required: [name, location]
+      properties:
+        name: { $ref: '#/components/schemas/NonEmptyString' }
+        website: { $ref: '#/components/schemas/NonEmptyString' }
+        location: { $ref: '#/components/schemas/NonEmptyString' }
+
+    # --- Projects
+    ProjectFields:
+      description: Champs communs (schéma ouvert, à composer)
+      type: object
+      required: [projectType, title, description, image, competences, programmingLanguages]
+      properties:
+        projectType: { $ref: '#/components/schemas/ProjectType' }
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        image:
+          $ref: '#/components/schemas/NonEmptyString'
+          description: Nom du fichier image (servi par le frontend dans `images/projects/`)
+        liveDemoLink: { $ref: '#/components/schemas/NonEmptyString' }
+        sourceCodeLink: { $ref: '#/components/schemas/NonEmptyString' }
+        competences:
+          type: array
+          description: Identifiants de compétences ; chacun doit exister dans `skills.json`
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+        programmingLanguages:
+          type: array
+          items: { $ref: '#/components/schemas/ProgrammingLanguage' }
+    Project:
+      allOf:
+        - $ref: '#/components/schemas/ProjectFields'
+      required: [id]
+      properties:
+        id: { $ref: '#/components/schemas/NonEmptyString' }
+      unevaluatedProperties: false
+    ProjectInput:
+      description: Corps de `PUT` ; un éventuel `id` est ignoré au profit de celui de l'URL
+      allOf:
+        - $ref: '#/components/schemas/ProjectFields'
+      properties:
+        id: { type: string }
+      unevaluatedProperties: false
+      example:
+        id: jsnake
+        projectType: Personal
+        title: JSnake
+        description: Snake en Java
+        image: jsnake.png
+        sourceCodeLink: https://github.com/dvachette/jsnake
+        competences: [realiser]
+        programmingLanguages: [Java]
+    ProjectPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, description: Ignoré (l'id vient de l'URL) }
+        projectType: { $ref: '#/components/schemas/ProjectType' }
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        image: { $ref: '#/components/schemas/NonEmptyString' }
+        liveDemoLink: { type: [string, 'null'], minLength: 1 }
+        sourceCodeLink: { type: [string, 'null'], minLength: 1 }
+        competences:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+        programmingLanguages:
+          type: array
+          items: { $ref: '#/components/schemas/ProgrammingLanguage' }
+    ResolvedProject:
+      description: Projet tel que renvoyé par l'API publique, compétences résolues en objets
+      type: object
+      required: [id, projectType, title, description, image, competences, programmingLanguages]
+      properties:
+        id: { type: string }
+        projectType: { $ref: '#/components/schemas/ProjectType' }
+        title: { type: string }
+        description: { type: string }
+        image: { type: string }
+        liveDemoLink: { type: string }
+        sourceCodeLink: { type: string }
+        competences:
+          type: array
+          items: { $ref: '#/components/schemas/Skill' }
+        programmingLanguages:
+          type: array
+          items: { $ref: '#/components/schemas/ProgrammingLanguage' }
+
+    # --- Skills
+    SkillDetail:
+      type: object
+      additionalProperties: false
+      required: [id, name]
+      properties:
+        id: { $ref: '#/components/schemas/NonEmptyString' }
+        name: { $ref: '#/components/schemas/NonEmptyString' }
+      example: { id: CE1.01, name: Respecter les besoins décrits par le client }
+    SkillLevel:
+      type: object
+      additionalProperties: false
+      required: [level, levelName, description, details]
+      properties:
+        level: { type: integer }
+        levelName: { $ref: '#/components/schemas/NonEmptyString' }
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        details:
+          type: array
+          items: { $ref: '#/components/schemas/SkillDetail' }
+    SkillFields:
+      description: Champs communs (schéma ouvert, à composer)
+      type: object
+      required: [name, image, description, level, details, levels]
+      properties:
+        name: { $ref: '#/components/schemas/NonEmptyString' }
+        image: { $ref: '#/components/schemas/NonEmptyString' }
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        level: { type: integer, description: Niveau atteint }
+        details:
+          type: array
+          items: { $ref: '#/components/schemas/SkillDetail' }
+        levels:
+          type: array
+          items: { $ref: '#/components/schemas/SkillLevel' }
+    Skill:
+      allOf:
+        - $ref: '#/components/schemas/SkillFields'
+      required: [id]
+      properties:
+        id:
+          $ref: '#/components/schemas/NonEmptyString'
+          description: Unique sur l'ensemble des sections
+      unevaluatedProperties: false
+    SkillInput:
+      description: Corps de `PUT` ; un éventuel `id` est ignoré au profit de celui de l'URL
+      allOf:
+        - $ref: '#/components/schemas/SkillFields'
+      properties:
+        id: { type: string }
+      unevaluatedProperties: false
+    SkillPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, description: Ignoré (l'id vient de l'URL) }
+        name: { $ref: '#/components/schemas/NonEmptyString' }
+        image: { $ref: '#/components/schemas/NonEmptyString' }
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        level: { type: integer }
+        details:
+          type: array
+          items: { $ref: '#/components/schemas/SkillDetail' }
+        levels:
+          type: array
+          items: { $ref: '#/components/schemas/SkillLevel' }
+    SkillSection:
+      type: object
+      additionalProperties: false
+      required: [section, icon, skills]
+      properties:
+        section: { $ref: '#/components/schemas/NonEmptyString' }
+        icon:
+          $ref: '#/components/schemas/NonEmptyString'
+          description: URL d'une icône SVG
+        skills:
+          type: array
+          items: { $ref: '#/components/schemas/Skill' }
+    SkillSectionInput:
+      type: object
+      additionalProperties: false
+      required: [section, icon]
+      properties:
+        section: { $ref: '#/components/schemas/NonEmptyString' }
+        icon: { $ref: '#/components/schemas/NonEmptyString' }
+        skills:
+          type: array
+          default: []
+          items: { $ref: '#/components/schemas/Skill' }
+    SkillSectionPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        section: { $ref: '#/components/schemas/NonEmptyString' }
+        icon: { $ref: '#/components/schemas/NonEmptyString' }
+
+    # --- Career
+    ExperienceFields:
+      description: Champs communs (schéma ouvert, à composer)
+      type: object
+      required: [type, title, organization, startDate, endDate, workload, highlights, tags]
+      properties:
+        type: { $ref: '#/components/schemas/ExperienceType' }
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        organization: { $ref: '#/components/schemas/Organization' }
+        startDate: { $ref: '#/components/schemas/Date' }
+        endDate:
+          description: '`null` si l''expérience est en cours'
+          oneOf:
+            - $ref: '#/components/schemas/Date'
+            - type: 'null'
+        workload: { $ref: '#/components/schemas/Workload' }
+        highlights:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+        tags:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+    Experience:
+      allOf:
+        - $ref: '#/components/schemas/ExperienceFields'
+      required: [id]
+      properties:
+        id: { $ref: '#/components/schemas/NonEmptyString' }
+      unevaluatedProperties: false
+    ExperienceInput:
+      description: Corps de `PUT` ; un éventuel `id` est ignoré au profit de celui de l'URL
+      allOf:
+        - $ref: '#/components/schemas/ExperienceFields'
+      properties:
+        id: { type: string }
+      unevaluatedProperties: false
+      example:
+        id: onyx-2026
+        type: internship
+        title: Stagiaire développeur web front-end et back-end
+        organization: { name: Onyx, website: 'http://www.1edoc.com/', location: 'Bron, France' }
+        startDate: '2026-04-07'
+        endDate: '2026-06-26'
+        workload: full-time
+        highlights: [Développement d'un module CRM pour la composition de devis.]
+        tags: [CRM]
+    ExperiencePatch:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, description: Ignoré (l'id vient de l'URL) }
+        type: { $ref: '#/components/schemas/ExperienceType' }
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        organization: { $ref: '#/components/schemas/Organization' }
+        startDate: { $ref: '#/components/schemas/Date' }
+        endDate:
+          oneOf:
+            - $ref: '#/components/schemas/Date'
+            - type: 'null'
+        workload: { $ref: '#/components/schemas/Workload' }
+        highlights:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+        tags:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+
+    EducationFields:
+      description: Champs communs (schéma ouvert, à composer)
+      type: object
+      required: [title, establishment, startDate, endDate, specialities, options]
+      properties:
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        establishment: { $ref: '#/components/schemas/Organization' }
+        startDate: { $ref: '#/components/schemas/Date' }
+        endDate:
+          description: '`null` si la formation est en cours'
+          oneOf:
+            - $ref: '#/components/schemas/Date'
+            - type: 'null'
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        specialities:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+    Education:
+      allOf:
+        - $ref: '#/components/schemas/EducationFields'
+      required: [id]
+      properties:
+        id: { $ref: '#/components/schemas/NonEmptyString' }
+      unevaluatedProperties: false
+    EducationInput:
+      description: Corps de `PUT` ; un éventuel `id` est ignoré au profit de celui de l'URL
+      allOf:
+        - $ref: '#/components/schemas/EducationFields'
+      properties:
+        id: { type: string }
+      unevaluatedProperties: false
+    EducationPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, description: Ignoré (l'id vient de l'URL) }
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        establishment: { $ref: '#/components/schemas/Organization' }
+        startDate: { $ref: '#/components/schemas/Date' }
+        endDate:
+          oneOf:
+            - $ref: '#/components/schemas/Date'
+            - type: 'null'
+        description: { type: [string, 'null'], minLength: 1 }
+        specialities:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+
+    CertificationFields:
+      description: Champs communs (schéma ouvert, à composer)
+      type: object
+      required: [name]
+      properties:
+        name: { $ref: '#/components/schemas/NonEmptyString' }
+        context:
+          $ref: '#/components/schemas/NonEmptyString'
+          description: Cadre dans lequel la formation a été suivie
+        date: { $ref: '#/components/schemas/Date' }
+    Certification:
+      allOf:
+        - $ref: '#/components/schemas/CertificationFields'
+      required: [id]
+      properties:
+        id: { $ref: '#/components/schemas/NonEmptyString' }
+      unevaluatedProperties: false
+    CertificationInput:
+      description: Corps de `PUT` ; un éventuel `id` est ignoré au profit de celui de l'URL
+      allOf:
+        - $ref: '#/components/schemas/CertificationFields'
+      properties:
+        id: { type: string }
+      unevaluatedProperties: false
+      example: { id: pssm, name: Premiers secours en santé mentale, context: Engagement associatif }
+    CertificationPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, description: Ignoré (l'id vient de l'URL) }
+        name: { $ref: '#/components/schemas/NonEmptyString' }
+        context: { type: [string, 'null'], minLength: 1 }
+        date:
+          oneOf:
+            - $ref: '#/components/schemas/Date'
+            - type: 'null'
+
+    Career:
+      type: object
+      required: [experiences, education, certifications]
+      properties:
+        experiences:
+          type: array
+          items: { $ref: '#/components/schemas/Experience' }
+        education:
+          type: array
+          items: { $ref: '#/components/schemas/Education' }
+        certifications:
+          type: array
+          items: { $ref: '#/components/schemas/Certification' }
+
+    # --- Interests
+    InterestFields:
+      description: Champs communs (schéma ouvert, à composer)
+      type: object
+      required: [title, icon, description, tags]
+      properties:
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        icon:
+          $ref: '#/components/schemas/NonEmptyString'
+          description: URL d'une icône SVG
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        tags:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
+    Interest:
+      allOf:
+        - $ref: '#/components/schemas/InterestFields'
+      required: [id]
+      properties:
+        id: { $ref: '#/components/schemas/NonEmptyString' }
+      unevaluatedProperties: false
+    InterestInput:
+      description: Corps de `PUT` ; un éventuel `id` est ignoré au profit de celui de l'URL
+      allOf:
+        - $ref: '#/components/schemas/InterestFields'
+      properties:
+        id: { type: string }
+      unevaluatedProperties: false
+      example:
+        id: open-source
+        title: Open source
+        icon: https://unpkg.com/lucide-static@latest/icons/git-fork.svg
+        description: Je crois en la collaboration et au partage des connaissances.
+        tags: [Debian, Linux]
+    InterestPatch:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: string, description: Ignoré (l'id vient de l'URL) }
+        title: { $ref: '#/components/schemas/NonEmptyString' }
+        icon: { $ref: '#/components/schemas/NonEmptyString' }
+        description: { $ref: '#/components/schemas/NonEmptyString' }
+        tags:
+          type: array
+          items: { $ref: '#/components/schemas/NonEmptyString' }
