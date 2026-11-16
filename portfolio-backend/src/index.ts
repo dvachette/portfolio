@@ -6,6 +6,8 @@ import { rateLimiter } from './middlewares/rateLimiter';
 import { contactRouter } from './routes/contact';
 import { projectsRouter } from './routes/projects';
 import { uesRouter } from './routes/skills';
+import { careerRouter } from './routes/career';
+import { interestsRouter } from './routes/interests';
 
 
 const app = express();
@@ -23,6 +25,8 @@ app.use('/contact', rateLimiter);
 app.use('/contact', contactRouter);
 app.use('/projects', projectsRouter);
 app.use('/skills', uesRouter);
+app.use('/career', careerRouter);
+app.use('/interests', interestsRouter);
 
 async function start(): Promise<void> {
     await initBot();

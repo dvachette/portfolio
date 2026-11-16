@@ -9,7 +9,7 @@ export async function getSkillTab(): Promise<{ section: string, icon: string, sk
     const res = await fetch(`${API_URL}/skills`)
     if (!res.ok) throw new Error('Erreur lors du chargement des compétences')
     const data = await res.json()
-    setCache('ues', data)
+    setCache('skills', data)
     return data
 }
 
@@ -19,7 +19,7 @@ export async function getSkillById(id: string): Promise<SkillModel> {
     const res = await fetch(`${API_URL}/skills/${id}`)
     if (!res.ok) throw new Error(`Erreur lors du chargement de la compétence ${id}`)
     const data = await res.json()
-    setCache(`ues:${id}`, data)
+    setCache(`skills:${id}`, data)
     return data
 }
 

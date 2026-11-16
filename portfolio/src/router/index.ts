@@ -6,7 +6,8 @@ import ContactView from '@/views/ContactView.vue'
 import ProjectDetails from '@/components/ProjectDetail.vue'
 import CreditsView from '@/views/CreditsView.vue'
 import CompetenceDetail from '@/components/CompetenceDetail.vue'
-import MeView from '@/views/MeView.vue'
+import CareerView from '@/views/CareerView.vue'
+import InterestsView from '@/views/InterestsView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,9 +54,19 @@ const router = createRouter({
             component: CreditsView,
         },
         {
+            path: '/parcours',
+            name: 'career',
+            component: CareerView,
+        },
+        {
+            path: '/interets',
+            name: 'interests',
+            component: InterestsView,
+        },
+        {
+            // Legacy "about me" page
             path: '/me',
-            name: 'me',
-            component: MeView,
+            redirect: { name: 'career' },
         },
     ],
 })

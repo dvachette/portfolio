@@ -1,13 +1,14 @@
 <script setup lang="ts">
 type NavItem = {
-    name: 'home' | 'me' | 'competences' | 'projects' | 'contact' | 'credits'
+    name: 'home' | 'career' | 'interests' | 'competences' | 'projects' | 'contact' | 'credits'
     label: string
     icon: string
 }
 
 const navItems: NavItem[] = [
     { name: 'home', label: 'Accueil', icon: 'https://unpkg.com/lucide-static@latest/icons/home.svg' },
-    { name: 'me', label: 'À propos de moi', icon: 'https://unpkg.com/lucide-static@latest/icons/user-round.svg' },
+    { name: 'career', label: 'Parcours', icon: 'https://unpkg.com/lucide-static@latest/icons/briefcase.svg' },
+    { name: 'interests', label: 'Centres d\'intérêt', icon: 'https://unpkg.com/lucide-static@latest/icons/heart.svg' },
     { name: 'competences', label: 'Compétences', icon: 'https://unpkg.com/lucide-static@latest/icons/code-2.svg' },
     { name: 'projects', label: 'Projets', icon: 'https://unpkg.com/lucide-static@latest/icons/folder-open.svg' },
     { name: 'contact', label: 'Contact', icon: 'https://unpkg.com/lucide-static@latest/icons/mail.svg' },
