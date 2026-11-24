@@ -3,13 +3,11 @@ import { useProjectService } from '@/services/ProjectService'
 import { ref, onMounted } from 'vue'
 import type { ProjectModel } from '@/models/ProjectModel'
 import ProjectCard from '@/components/ProjectCard.vue'
-import { useRouter } from 'vue-router'
 
 const projectService = useProjectService()
 const projects = ref<ProjectModel[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-const router = useRouter()
 
 onMounted(async function() {
     try {
@@ -20,10 +18,6 @@ onMounted(async function() {
         loading.value = false
     }
 })
-
-function selectProject(project: ProjectModel) {
-    router.push({ path: `/projects/${project.id}` })
-}
 </script>
 <template>
     <h1>Mes projets</h1>
@@ -31,9 +25,8 @@ function selectProject(project: ProjectModel) {
     <div v-else class="projects-list">
         <ProjectCard
             v-for="project in projects"
-            :key="project.title"
+            :key="project.id"
             :project="project"
-            @select="selectProject"
         />
     </div>
     <RouterView />
@@ -49,7 +42,6 @@ h1 {
     font-size: 2.5em;
     color: #eee;
     font-weight: bold;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     cursor: default;
 }
 @media (max-width: 600px) {

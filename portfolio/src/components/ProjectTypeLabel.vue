@@ -1,56 +1,94 @@
 <script setup lang="ts">
 import type { ProjectType } from '@/types/ProjectType'
-import { ref } from 'vue'
-interface CompetenceLevelProps {
+import { computed, ref } from 'vue'
+
+interface ProjectTypeLabelProps {
     projectType: ProjectType
+    /**
+     * When true, the icon is a button whose tooltip toggles on tap (touch friendly).
+     * Keep false inside links/cards: the tooltip then only shows on hover.
+     */
+    interactive?: boolean
 }
-const { projectType } = defineProps<CompetenceLevelProps>()
-const isPopupVisible = ref(false)
+const { projectType, interactive = false } = defineProps<ProjectTypeLabelProps>()
+
 const base = import.meta.env.BASE_URL
-function showPopup() {
-    isPopupVisible.value = true
-}
-function hidePopup() {
-    isPopupVisible.value = false
-}
+const open = ref(false)
+const label = computed(() => {
+    if (projectType === 'Academic') return 'Projet scolaire'
+    if (projectType === 'Personal') return 'Projet personnel'
+    return 'Type de projet inconnu'
+})
+const icon = computed(
+    () => `${base}assets/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`,
+)
 </script>
+
 <template>
-    <div class="project_type" @mouseover="showPopup" @click="$event.stopPropagation();showPopup()">
-        <img
-            :src="`${base}assets/${projectType === 'Academic' ? 'academic.png' : 'personal.png'}`"
-            alt="Type de projet"
-            class="project_type_icon"
-            :class="`project_type--${projectType}`"
-        />
-        <div class="popup" v-if="isPopupVisible" @mouseleave="hidePopup" @click="$event.stopPropagation();hidePopup()">
-            <p v-if="projectType === 'Academic'">Projet scolaire</p>
-            <p v-else-if="projectType === 'Personal'">Projet personnel</p>
-            <p v-else>Type de projet inconnu</p>
-        </div>
-    </div>
+    <button
+        v-if="interactive"
+        type="button"
+        :class="['project_type', { 'project_type--open': open }]"
+        :aria-label="label"
+        :aria-expanded="open"
+        @click.stop="open = !open"
+        @blur="open = false"
+    >
+        <img :src="icon" alt="" class="project_type_icon" />
+        <span class="popup" role="tooltip">{{ label }}</span>
+    </button>
+    <span v-else class="project_type">
+        <img :src="icon" :alt="label" class="project_type_icon" />
+        <span class="popup" aria-hidden="true">{{ label }}</span>
+    </span>
 </template>
+
 <style scoped>
-.popup {
-    position: absolute;
-    top:0;
-    left: 0;
-    transform: translate(0, -25%);
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-top: 10px;
-    cursor: default;
-}
 .project_type {
-    display: flex;
+    position: relative;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex: none;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+button.project_type {
+    width: 2.75rem;
+    height: 2.75rem;
     cursor: pointer;
 }
+
 .project_type_icon {
     width: 20px;
     height: 20px;
+}
+
+.popup {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    width: max-content;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-surface-solid);
+    box-shadow: var(--shadow-card);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: normal;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+}
+
+.project_type:hover .popup,
+.project_type:focus-visible .popup,
+.project_type--open .popup {
+    visibility: visible;
+    opacity: 1;
 }
 </style>

@@ -1,0 +1,94 @@
+/* Global design tokens and base styles shared by every view. */
+:root {
+    --font-sans: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    --font-mono: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+    --color-bg: #222;
+    --color-surface: #333c;
+    --color-surface-hover: #444c;
+    --color-surface-solid: #333;
+    --color-border: #444;
+
+    --color-text: #ddd;
+    --color-text-strong: #eee;
+    --color-text-muted: #aaa;
+
+    --color-primary: #3178c6;
+    --color-primary-soft: #3178c680;
+    --color-primary-light: #7ab4f5;
+    --color-success: #4caf50;
+
+    --radius-sm: 5px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+    --radius-pill: 999px;
+
+    --shadow-card: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+    --header-height: 4rem;
+    --bottom-nav-height: 3.75rem;
+    --page-padding: 2rem;
+}
+
+@media (max-width: 600px) {
+    :root {
+        --page-padding: 1rem;
+    }
+}
+
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+}
+
+/* On mobile the navigation moves to a bottom bar (see HeaderComponent) */
+@media (max-width: 800px) {
+    html {
+        scroll-padding-top: 1rem;
+    }
+}
+
+body {
+    margin: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+img {
+    max-width: 100%;
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

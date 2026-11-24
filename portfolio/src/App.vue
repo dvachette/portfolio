@@ -23,7 +23,7 @@ import FloatingLines from '@/components/FloatingLines/FloatingLines.vue'
 
 <style scoped>
 main {
-    padding: 2em;
+    padding: var(--page-padding);
 }
 #lines {
     position: fixed;
@@ -35,6 +35,12 @@ main {
 }
 .mobile-bg {
   display: none;
+}
+
+@media (max-width: 800px) {
+    main {
+        padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--page-padding));
+    }
 }
 
 @media (max-width: 600px) {
@@ -54,11 +60,5 @@ main {
         display: none;
     }
 
-}
-</style>
-<style>
-html {
-    scroll-behavior: smooth;
-    scroll-padding-top: 80px;
 }
 </style>

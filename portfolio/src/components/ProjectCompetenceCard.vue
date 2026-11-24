@@ -3,14 +3,13 @@ import CompetenceLevel from './CompetenceLevel.vue'
 import type { SkillModel } from '@/models/SkillModel'
 const base = import.meta.env.BASE_URL
 const { competence } = defineProps<{ competence: SkillModel }>()
-const emit = defineEmits(['select'])
-function selectCompetence() {
-    emit('select', competence)
-}
 </script>
 
 <template>
-    <div class="competence_card" @click="selectCompetence">
+    <RouterLink
+        class="competence_card"
+        :to="{ name: 'competence-details', params: { id: competence.id } }"
+    >
         <div class="competence_card__header">
             <CompetenceLevel
                 :level="competence.level" 
@@ -21,9 +20,9 @@ function selectCompetence() {
         </div>
         <div class="competence_card__content">
             <p class="competence_card__description">{{ competence.description }}</p>
-            <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="Competence image" class="skill-img" />
+            <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="" class="skill-img" />
         </div>
-    </div>
+    </RouterLink>
 </template>
 <style scoped>
 /*
@@ -39,10 +38,12 @@ function selectCompetence() {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     padding: 0 20px 20px 20px;
     margin: 3%;
+    display: block;
+    color: inherit;
+    text-decoration: none;
     transition:
         transform 0.2s,
         background-color 0.2s;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .competence_card__header {
     display: flex;
@@ -71,7 +72,7 @@ function selectCompetence() {
     margin-top: 10px;
 }
 /* Hover effect for larger screens */
-@media (min-width: 600px) {
+@media (hover: hover) and (min-width: 600px) {
     .competence_card:hover {
         transform: scale(1.03);
         background-color: #444;

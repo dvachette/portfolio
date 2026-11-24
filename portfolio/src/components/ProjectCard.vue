@@ -4,10 +4,9 @@ import LanguageTag from './LanguageTag.vue'
 import ProjectTypeLabel from './ProjectTypeLabel.vue'
 const base = import.meta.env.BASE_URL
 const { project } = defineProps<{ project: ProjectModel }>()
-const emit = defineEmits(['select'])
 </script>
 <template>
-    <div class="project_card" @click="emit('select', project)">
+    <RouterLink class="project_card" :to="{ name: 'project-details', params: { id: project.id } }">
         <div class="project_card__text">
             <div class="project_card__header">
                 <ProjectTypeLabel :projectType="project.projectType" />
@@ -29,9 +28,9 @@ const emit = defineEmits(['select'])
             </p>
         </div>
         <div class="project_card__image">
-            <img :src="`${base}images/projects/${project.image}`" alt="Project image" />
+            <img :src="`${base}images/projects/${project.image}`" :alt="project.title" loading="lazy" />
         </div>
-    </div>
+    </RouterLink>
 </template>
 <style scoped>
 .project_card {
@@ -41,8 +40,9 @@ const emit = defineEmits(['select'])
     padding: 1em;
     border-radius: 8px;
     cursor: pointer;
+    color: inherit;
+    text-decoration: none;
     background-color: #333c;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     max-width: 500px;
     transition:
         transform 0.2s,
@@ -81,8 +81,13 @@ div.project_card__text h2 {
     flex-wrap: wrap;
     gap: 0.5em;
 }
-.project_card:hover {
-    transform: scale(1.03);
+@media (hover: hover) {
+    .project_card:hover {
+        transform: scale(1.03);
+        background-color: #444c;
+    }
+}
+.project_card:active {
     background-color: #444c;
 }
 

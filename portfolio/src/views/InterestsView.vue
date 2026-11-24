@@ -50,7 +50,6 @@ onMounted(async function () {
 
 <style scoped>
 .interests {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     color: #ddd;
     max-width: 1100px;
     margin: 0 auto;

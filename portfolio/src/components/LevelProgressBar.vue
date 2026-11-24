@@ -2,8 +2,10 @@
 interface CompetenceLevelProps {
     level: number
     max: number
+    /** Level whose details are currently displayed */
+    selected?: number
 }
-const { level, max } = defineProps<CompetenceLevelProps>()
+const { level, max, selected } = defineProps<CompetenceLevelProps>()
 const emit = defineEmits<{
     levelSelected: [level: number]
 }>()
@@ -13,7 +15,7 @@ function selectLevel(level: number) {
 }
 </script>
 <template>
-    <div class="competence_level_progress_bar">
+    <div class="competence_level_progress_bar" role="group" aria-label="Choisir un niveau">
         <div
             class="progress_bar_fragment"
             v-for="i in max"
@@ -21,7 +23,15 @@ function selectLevel(level: number) {
             :class="`progress_bar_fragment--${i <= level ? 'filled' : 'empty'}`"
         >
             <span class="progress_bar_fill"></span>
-            <p class="progress_bar_label" @click="selectLevel(i)">{{ i }}</p>
+            <button
+                type="button"
+                :class="['progress_bar_label', { 'progress_bar_label--selected': i === selected }]"
+                :aria-pressed="i === selected"
+                :aria-label="`Niveau ${i}`"
+                @click="selectLevel(i)"
+            >
+                {{ i }}
+            </button>
         </div>
     </div>
 </template>
@@ -51,7 +61,11 @@ function selectLevel(level: number) {
     background-color: #eee;
 }
 .progress_bar_label {
-    font-size: 12px;
+    flex: none;
+    padding: 0;
+    border: none;
+    font-family: inherit;
+    font-weight: bold;
     color: #f3f3f3;
     /* Glowing circle */
     width: 30px;
@@ -60,6 +74,10 @@ function selectLevel(level: number) {
     text-align: center;
     line-height: 30px;
     font-size: 1.6em;
+}
+.progress_bar_label--selected {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
 }
 .progress_bar_fragment--filled .progress_bar_label {
     background-color: rgb(4, 175, 197);
@@ -84,6 +102,25 @@ function selectLevel(level: number) {
 @media (max-width: 800px) {
     .progress_bar_fill {
         width: 20vw;
+    }
+}
+@media (max-width: 600px) {
+    .competence_level_progress_bar {
+        gap: 4px;
+        padding: 0 0.5rem;
+    }
+    .progress_bar_fill {
+        width: auto;
+        flex: 1;
+    }
+    .progress_bar_fragment {
+        flex: 1;
+    }
+    /* Larger touch targets */
+    .progress_bar_label {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
     }
 }
 </style>

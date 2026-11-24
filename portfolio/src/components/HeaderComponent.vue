@@ -1,25 +1,78 @@
 <script setup lang="ts">
+import { computed, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import AppIcon from '@/components/AppIcon.vue'
+import type { IconName } from '@/types/IconName'
+
 type NavItem = {
     name: 'home' | 'career' | 'interests' | 'competences' | 'projects' | 'contact' | 'credits'
     label: string
-    icon: string
+    icon: IconName
+    /** Position in the desktop bar */
+    order: number
 }
 
-const navItems: NavItem[] = [
-    { name: 'home', label: 'Accueil', icon: 'https://unpkg.com/lucide-static@latest/icons/home.svg' },
-    { name: 'career', label: 'Parcours', icon: 'https://unpkg.com/lucide-static@latest/icons/briefcase.svg' },
-    { name: 'interests', label: 'Centres d\'intérêt', icon: 'https://unpkg.com/lucide-static@latest/icons/heart.svg' },
-    { name: 'competences', label: 'Compétences', icon: 'https://unpkg.com/lucide-static@latest/icons/code-2.svg' },
-    { name: 'projects', label: 'Projets', icon: 'https://unpkg.com/lucide-static@latest/icons/folder-open.svg' },
-    { name: 'contact', label: 'Contact', icon: 'https://unpkg.com/lucide-static@latest/icons/mail.svg' },
-    { name: 'credits', label: 'Crédits', icon: 'https://unpkg.com/lucide-static@latest/icons/book-open-text.svg' },
+// Primary items are always visible; secondary ones go into the "More" menu on mobile.
+const primaryItems: NavItem[] = [
+    { name: 'home', label: 'Accueil', icon: 'house', order: 1 },
+    { name: 'career', label: 'Parcours', icon: 'briefcase', order: 2 },
+    { name: 'competences', label: 'Compétences', icon: 'code-xml', order: 4 },
+    { name: 'projects', label: 'Projets', icon: 'folder-open', order: 5 },
+    { name: 'contact', label: 'Contact', icon: 'mail', order: 6 },
 ]
+const secondaryItems: NavItem[] = [
+    { name: 'interests', label: "Centres d'intérêt", icon: 'heart', order: 3 },
+    { name: 'credits', label: 'Crédits', icon: 'book-open-text', order: 7 },
+]
+
+const route = useRoute()
+const menuOpen = ref(false)
+const menuRef = ref<HTMLElement | null>(null)
+
+const secondaryActive = computed(() =>
+    secondaryItems.some((item) => route.matched.some((record) => record.name === item.name)),
+)
+
+function onPointerDown(event: PointerEvent): void {
+    if (menuRef.value && !menuRef.value.contains(event.target as Node)) {
+        menuOpen.value = false
+    }
+}
+
+function onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+        menuOpen.value = false
+    }
+}
+
+watch(menuOpen, (open) => {
+    if (open) {
+        document.addEventListener('pointerdown', onPointerDown)
+        document.addEventListener('keydown', onKeyDown)
+    } else {
+        document.removeEventListener('pointerdown', onPointerDown)
+        document.removeEventListener('keydown', onKeyDown)
+    }
+})
+
+watch(
+    () => route.fullPath,
+    () => {
+        menuOpen.value = false
+    },
+)
+
+onUnmounted(() => {
+    document.removeEventListener('pointerdown', onPointerDown)
+    document.removeEventListener('keydown', onKeyDown)
+})
 </script>
+
 <template>
     <header>
-        <nav>
+        <nav aria-label="Navigation principale">
             <RouterLink
-                v-for="item in navItems"
+                v-for="item in primaryItems"
                 :key="item.name"
                 v-slot="{ href, navigate, isActive }"
                 :to="{ name: item.name }"
@@ -28,18 +81,54 @@ const navItems: NavItem[] = [
                 <a
                     :href="href"
                     :class="['nav-link', { 'nav-link--active': isActive }]"
-                    :aria-label="item.label"
-                    :title="item.label"
+                    :style="{ order: item.order }"
+                    :aria-current="isActive ? 'page' : undefined"
                     @click="navigate"
                 >
-                        <img :src="item.icon" alt="" aria-hidden="true" />
-
+                    <AppIcon :name="item.icon" class="nav-icon" />
                     <span class="nav-label">{{ item.label }}</span>
                 </a>
             </RouterLink>
+
+            <div ref="menuRef" class="nav-more">
+                <button
+                    type="button"
+                    :class="['nav-link', 'nav-more__toggle', { 'nav-link--active': secondaryActive }]"
+                    :aria-expanded="menuOpen"
+                    aria-controls="nav-more-menu"
+                    @click="menuOpen = !menuOpen"
+                >
+                    <AppIcon name="ellipsis" class="nav-icon" />
+                    <span class="nav-label">Plus</span>
+                </button>
+                <div
+                    id="nav-more-menu"
+                    :class="['nav-more__menu', { 'nav-more__menu--open': menuOpen }]"
+                >
+                    <RouterLink
+                        v-for="item in secondaryItems"
+                        :key="item.name"
+                        v-slot="{ href, navigate, isActive }"
+                        :to="{ name: item.name }"
+                        custom
+                    >
+                        <a
+                            :href="href"
+                            :class="['nav-link', { 'nav-link--active': isActive }]"
+                            :style="{ order: item.order }"
+                            :aria-current="isActive ? 'page' : undefined"
+                            @click="navigate"
+                        >
+                            <AppIcon :name="item.icon" class="nav-icon" />
+                            <span class="nav-label">{{ item.label }}</span>
+                        </a>
+                    </RouterLink>
+                </div>
+            </div>
         </nav>
     </header>
 </template>
+
 <style scoped>
 header {
     background-color: #111;
@@ -49,10 +138,12 @@ header {
     top: 0;
     z-index: 1000;
 }
+
 nav {
     display: flex;
     gap: 2rem;
 }
+
 .nav-link {
     display: inline-flex;
     align-items: center;
@@ -60,25 +151,15 @@ nav {
     color: #ddd;
     text-decoration: none;
     font-size: 1.2em;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     line-height: 1;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }
 
-.nav-link svg {
-    width: 1.15em;
-    height: 1.15em;
-    flex: none;
-}
-
-.nav-link img {
-    width: 1.15em;
-    height: 1.15em;
-    flex: none;
-    filter: brightness(0) invert(1);
-}
-
-.nav-label {
-    display: inline;
+.nav-link:hover {
+    color: #fff;
 }
 
 .nav-link--active {
@@ -86,49 +167,111 @@ nav {
     text-decoration: underline;
 }
 
+/* Desktop: the "More" wrapper disappears and its links sit in the bar like the others */
+.nav-more,
+.nav-more__menu {
+    display: contents;
+}
+
+.nav-more__toggle {
+    display: none;
+}
+
 @media (max-width: 800px) {
+    header {
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+        padding: 0 0.25rem env(safe-area-inset-bottom);
+        border-top: 1px solid var(--color-border);
+        background-color: #111e;
+        backdrop-filter: blur(8px);
+    }
+
     nav {
-        justify-content: space-between;
-        gap: 0.5rem;
+        height: 100%;
+        gap: 0;
     }
 
     .nav-link {
+        order: 0 !important;
+        flex: 1 1 0;
+        min-width: 0;
         flex-direction: column;
         justify-content: center;
-        gap: 0.3rem;
-        font-size: 0.82rem;
-        min-width: 0;
-        text-align: center;
-        padding: 0.2rem 0;
+        gap: 0.25rem;
+        padding: 0 0.1rem;
+        font-size: 0.68rem;
+        color: #aaa;
         text-decoration: none;
-        opacity: 0.72;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    .nav-link svg {
-        width: 1.35rem;
-        height: 1.35rem;
-    }
-
-    .nav-link img {
-        width: 1.35rem;
-        height: 1.35rem;
-        filter: brightness(0) invert(1);
+    .nav-icon {
+        width: 1.4rem;
+        height: 1.4rem;
     }
 
     .nav-label {
-        display: none;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .nav-link--active {
-        opacity: 1;
-        text-decoration: none;
+        color: #fff;
     }
 
-    .nav-link--active .nav-label {
-        display: block;
-        font-size: 0.72rem;
-        line-height: 1;
+    .nav-link--active .nav-icon {
+        color: var(--color-primary-light);
+    }
+
+    .nav-more {
+        display: flex;
+        flex: 1 1 0;
+        min-width: 0;
+        position: relative;
+    }
+
+    .nav-more__toggle {
+        display: inline-flex;
+    }
+
+    .nav-more__menu {
+        display: none;
+        position: absolute;
+        right: 0.25rem;
+        bottom: calc(100% + 0.5rem);
+        flex-direction: column;
+        min-width: 13rem;
+        padding: 0.5rem;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background-color: #1a1a1af5;
+        box-shadow: var(--shadow-card);
+    }
+
+    .nav-more__menu--open {
+        display: flex;
+    }
+
+    .nav-more__menu .nav-link {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        min-height: 2.75rem;
+        padding: 0 0.75rem;
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+    }
+
+    .nav-more__menu .nav-link--active {
+        background-color: var(--color-surface);
     }
 }
 </style>

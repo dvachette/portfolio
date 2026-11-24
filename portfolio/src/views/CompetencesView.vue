@@ -3,19 +3,13 @@ import CompetenceCard from '@/components/CompetenceCard.vue'
 import type { SkillModel } from '@/models/SkillModel'
 import { useSkillsService } from '@/services/SkillsService'
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const ueService = useSkillsService()
 const competences = ref<{ section: string, icon: string, skills: SkillModel[] }[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const activeSection = ref<string>('')
 let observer: IntersectionObserver
-
-function openDetail(competence: SkillModel): void {
-    router.push(`/competences/${competence.id}`)
-}
 
 function makeSlug(name: string): string {
     return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
@@ -120,9 +114,8 @@ function scrollToSection(slug: string): void {
                 <div v-else class="competences">
                     <CompetenceCard
                         v-for="competence in section.skills"
-                        :key="competence.name"
+                        :key="competence.id"
                         :competence="competence"
-                        @select="openDetail"
                     />
                 </div>
             </template>
@@ -133,7 +126,6 @@ function scrollToSection(slug: string): void {
 
 <style scoped>
 h1 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 2.5em;
     font-weight: bold;
     color: #eee;
@@ -141,7 +133,6 @@ h1 {
 }
 
 h2 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 2em;
     font-weight: bold;
     color: #eee;

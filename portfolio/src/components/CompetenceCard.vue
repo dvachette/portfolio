@@ -5,13 +5,12 @@ const base = import.meta.env.BASE_URL;
 const { competence } = defineProps<{
     competence: SkillModel
 }>()
-const emit = defineEmits(['select'])
-function selectCompetence() {
-    emit('select', competence)
-}
 </script>
 <template>
-    <div class="competence_card" @click="selectCompetence">
+    <RouterLink
+        class="competence_card"
+        :to="{ name: 'competence-details', params: { id: competence.id } }"
+    >
         <div class="content_text">
             <div class="competence_card__header">
                 <CompetenceLevel 
@@ -29,8 +28,8 @@ function selectCompetence() {
                 }}
             </p>            
         </div>
-        <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="Competence image" class="skill-img" />
-    </div>
+        <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="" class="skill-img" loading="lazy" />
+    </RouterLink>
 </template>
 <style scoped>
 /*
@@ -49,9 +48,10 @@ function selectCompetence() {
     transition:
         transform 0.2s,
         background-color 0.2s;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     max-width: 100%;
     display: flex;
+    color: inherit;
+    text-decoration: none;
 }
 .contect_text {
     display: flex;
@@ -72,7 +72,6 @@ function selectCompetence() {
     font-size: 1em;
     color: #aaa;
     margin-top: 10px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: bold;
 } 
 .skill-img {
@@ -88,8 +87,8 @@ function selectCompetence() {
     flex-direction: row;
     gap: 10px;
 }
-/* Hover effect for larger screens */
-@media (min-width: 600px) {
+/* Hover effect for pointer devices only (avoids sticky hover on touch) */
+@media (hover: hover) and (min-width: 600px) {
     .competence_card:hover {
         transform: scale(1.03);
         background-color: #444c;

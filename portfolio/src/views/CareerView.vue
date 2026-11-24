@@ -158,7 +158,6 @@ onMounted(async function () {
 .career {
     /* Slightly below header + main padding, so the sidebar is pinned from the start */
     --profile-top: 5.5rem;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     color: #ddd;
     max-width: 1200px;
     margin: 0 auto;

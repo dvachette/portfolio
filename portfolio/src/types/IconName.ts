@@ -1,0 +1,10 @@
+export type IconName =
+    | 'house'
+    | 'briefcase'
+    | 'heart'
+    | 'code-xml'
+    | 'folder-open'
+    | 'mail'
+    | 'book-open-text'
+    | 'ellipsis'
+    | 'x'

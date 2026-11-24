@@ -20,7 +20,6 @@
 <style scoped>
 .home {
     color: #eee;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     cursor: default;
     justify-self: center;
     align-self: center;

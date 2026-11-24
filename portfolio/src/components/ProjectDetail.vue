@@ -2,32 +2,27 @@
 import type { ProjectModel } from '@/models/ProjectModel'
 import LanguageTag from './LanguageTag.vue'
 import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import type { SkillModel } from '@/models/SkillModel'
+import { ref, watch } from 'vue'
 import ProjectTypeLabel from './ProjectTypeLabel.vue'
 import SkeletonProjectDetail from './skeletons/SkeletonProjectDetail.vue'
+import BaseModal from './BaseModal.vue'
 
 const router = useRouter()
+const route = useRoute()
 const projectService = useProjectService()
-const projectId = ref(router.currentRoute.value.params.id as string)
 const project = ref<ProjectModel | null>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
-const modalRef = ref<HTMLElement | null>(null)
-const scrollRatio = ref(0)
 const base = import.meta.env.BASE_URL
-const CLOSE_ANIMATION_DURATION = 300 // Durée de l'animation de fermeture en ms
-const isClosing = ref(false)
-
 
 async function loadData(id: string): Promise<void> {
     loading.value = true
     error.value = null
     project.value = null
     try {
-        project!.value = await projectService.getProjectById(id)
+        project.value = await projectService.getProjectById(id)
     } catch (e) {
         error.value = e instanceof Error ? e.message : 'Erreur de chargement'
     } finally {
@@ -35,187 +30,74 @@ async function loadData(id: string): Promise<void> {
     }
 }
 
-watch(() => router.currentRoute.value.params.id, async function(newId) {
-    projectId.value = newId as string
-    await loadData(projectId.value)
-})
+watch(
+    () => route.params.id,
+    (id) => {
+        if (typeof id === 'string') void loadData(id)
+    },
+    { immediate: true },
+)
 
-onMounted(async function() {
-    modalRef.value?.addEventListener('scroll', onScroll)
-    document.addEventListener('keydown', onKeyDown)
-    onScroll()
-    await loadData(projectId.value)
-})
-
-onUnmounted(function() {
-    modalRef.value?.removeEventListener('scroll', onScroll)
-    document.removeEventListener('keydown', onKeyDown)
-})
-
-function onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-        closeDetail()
-    }
-}
-
-function closeDetail() {
-    if (isClosing.value) return
-    isClosing.value = true
-    setTimeout(() => {
-        void router.push({ name: 'projects' })
-    }, CLOSE_ANIMATION_DURATION)
-}
-
-function goToCompetence(competence: SkillModel) {
-    router.push({ name: 'competence-details', params: { id: competence.id } })
-}
-
-function onScroll() {
-    const el = modalRef.value
-    if (!el) return
-    const remaining = el.scrollHeight - el.scrollTop - el.clientHeight
-    scrollRatio.value = Math.min(remaining / 80, 1)
+function onClosed(): void {
+    void router.push({ name: 'projects' })
 }
 </script>
 <template>
-    <span v-if="error">{{ error }}</span>
-    <div 
-        v-else-if="project || loading"
-        class="project-detail"
-        :class="{ 'competence_detail--closing': isClosing }"
-        ref="modalRef"
-    >
-        <template v-if="project">
-            <div class="project_detail__header">
-                <div class="project_type_label">
-                    <ProjectTypeLabel :projectType="project!.projectType" />
-                </div>
-                <h1>{{ project!.title }}</h1>
-                <span class="close-button" @click="closeDetail">&Cross;</span>
-            </div>
+    <BaseModal @closed="onClosed">
+        <template #title>
+            <template v-if="project">
+                <ProjectTypeLabel :project-type="project.projectType" interactive />
+                <h1>{{ project.title }}</h1>
+            </template>
+        </template>
+
+        <p v-if="error" class="project_detail__error">{{ error }}</p>
+        <template v-else-if="project">
             <div class="project_detail__content">
                 <div class="project_detail_content__text">
                     <div class="project_detail__languages">
                         <LanguageTag
-                            :language="language"
-                            v-for="language in project!.programmingLanguages"
+                            v-for="language in project.programmingLanguages"
                             :key="language"
+                            :language="language"
                         />
                     </div>
-                    <p>{{ project!.description }}</p>
+                    <p>{{ project.description }}</p>
                     <div class="project_detail_content__links">
-                        <a :href="project!.sourceCodeLink" target="_blank" v-if="project!.sourceCodeLink"
+                        <a
+                            v-if="project.sourceCodeLink"
+                            :href="project.sourceCodeLink"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             >Voir le code source</a
                         >
-                        <a :href="project!.liveDemoLink" target="_blank" v-if="project!.liveDemoLink"
+                        <a
+                            v-if="project.liveDemoLink"
+                            :href="project.liveDemoLink"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             >Voir la démo en ligne</a
                         >
                     </div>
                 </div>
 
                 <div class="project_detail_content__image">
-                    <img :src="`${base}images/projects/${project!.image}`" alt="Project image" />
+                    <img :src="`${base}images/projects/${project.image}`" :alt="project.title" />
                 </div>
             </div>
-            <div
-                class="project_detail__competences"
-                v-if="project!.competences && project!.competences.length > 0"
-            >
+            <div v-if="project.competences?.length" class="project_detail__competences">
                 <h2>Compétences utilisées</h2>
                 <ProjectCompetenceCard
-                    v-for="competence in project!.competences"
+                    v-for="competence in project.competences"
                     :key="competence.id"
                     :competence="competence"
-                    @select="goToCompetence"
                 />
             </div>
-            <span class="scroll-arrow" :style="{ opacity: scrollRatio }" aria-hidden="true">▼</span>
         </template>
         <SkeletonProjectDetail v-else-if="loading" />
-    </div>
+    </BaseModal>
 </template>
 <style scoped>
-.project-detail {
-    border: none;
-    border-radius: 8px;
-    background-color: #444757;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    margin-top: 2em;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 70vw;
-    height: 70vh;
-    overflow: scroll;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    box-shadow: 0px 0px 8px rgba(175, 175, 175, 0.411);
-    transition: all 0.3s ease;
-    animation: zoomAtOpen 0.3s ease;
-}
-@keyframes zoomAtOpen {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes zoomAtClose {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-    }
-}
-.competence_detail--closing {
-    animation: zoomAtClose 0.3s ease forwards;
-    pointer-events: none;
-}
-
-.project-detail::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
-}
-.project-detail:hover {
-    box-shadow: 0px 0px 18px rgba(175, 175, 175, 0.8);
-}
-.project_detail__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    position: sticky;
-    top: 0;
-    background-color: #333;
-    margin: 0;
-    width: 100%;
-    z-index: 10;
-}
-.close-button {
-    font-size: 2em;
-    cursor: pointer;
-    font-weight: bold;
-    color: #ff0000;
-    position: relative;
-    top: 0;
-    right: 1%;
-    transition: font-size 0.3s ease;
-}
-.close-button:hover {
-    font-size: 2.4em;
-}
-h1 {
-    font-size: 2em;
-    color: #eee;
-    margin: 0;
-    padding: 0.5em;
-}
 .project_detail__content {
     display: flex;
     flex-direction: row;
@@ -241,6 +123,10 @@ h1 {
     height: 50%;
     object-fit: cover;
     object-position: center;
+}
+.project_detail__error {
+    padding: 1em;
+    color: #f88;
 }
 .project_detail__competences {
     padding: 1em;
@@ -270,42 +156,16 @@ h1 {
     text-decoration: underline;
 }
 
-.project_type_label {
-    margin: 1em;
-}
-.scroll-arrow {
-    position: sticky;
-    bottom: 12px;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    font-size: 1.6em;
-    color: #ccc;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    animation: bounce 1.2s infinite ease-in-out;
-}
-
-@keyframes bounce {
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(6px);
-    }
-}
 @media (max-width: 800px) {
-    .project-detail {
-        width: 90vw;
-        height: 80vh;
-    }
     .project_detail__content {
         flex-direction: column;
     }
     .project_detail_content__image {
         width: 100%;
         height: fit-content;
+    }
+    .project_detail_content__image img {
+        width: 100%;
     }
 }
 </style>

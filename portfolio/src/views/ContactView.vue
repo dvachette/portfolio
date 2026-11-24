@@ -74,7 +74,6 @@ async function handleSubmit(): Promise<void> {
     flex-direction: column;
     align-items: center;
     padding: 2em;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 .contact__block {
     display: flex;

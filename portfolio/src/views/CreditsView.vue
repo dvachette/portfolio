@@ -67,7 +67,6 @@
     display: flex;
     flex-direction: column;
     padding: 2em;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     align-items: center;
     background-color: #333c;
     padding: 1em;
@@ -88,7 +87,6 @@ h1 {
     font-size: 2.5em;
     font-weight: bold;
     color: #eee;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     cursor: default;
     text-align: center;
 }
