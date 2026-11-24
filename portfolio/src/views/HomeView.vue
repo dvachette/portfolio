@@ -33,20 +33,20 @@
 p {
     font-size: 1.25em;
     color: #ddd;
-    text-align: center;
     background-color: #333c;
     padding: 1em;
     border-radius: 10px;
     width: 80%;
     margin: 2em auto;
     cursor: default;
+    text-align: justify;
+    hyphens: auto;
 }
 
 @media (max-width: 600px) {
     p {
         width: 80%;
         font-size: 1.4em;
-        text-align: left;
     }
 }
 </style>

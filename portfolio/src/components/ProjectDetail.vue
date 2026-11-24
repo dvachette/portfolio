@@ -2,7 +2,7 @@
 import type { ProjectModel } from '@/models/ProjectModel'
 import LanguageTag from './LanguageTag.vue'
 import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
 import { ref, watch } from 'vue'
 import ProjectTypeLabel from './ProjectTypeLabel.vue'
@@ -10,7 +10,7 @@ import SkeletonProjectDetail from './skeletons/SkeletonProjectDetail.vue'
 import BaseModal from './BaseModal.vue'
 
 const router = useRouter()
-const route = useRoute()
+const props = defineProps<{ id: string }>()
 const projectService = useProjectService()
 const project = ref<ProjectModel | null>(null)
 const loading = ref(true)
@@ -31,10 +31,8 @@ async function loadData(id: string): Promise<void> {
 }
 
 watch(
-    () => route.params.id,
-    (id) => {
-        if (typeof id === 'string') void loadData(id)
-    },
+    () => props.id,
+    (id) => void loadData(id),
     { immediate: true },
 )
 

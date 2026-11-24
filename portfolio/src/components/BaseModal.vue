@@ -1,3 +1,13 @@
+<script lang="ts">
+/** Number of open modals: the page behind stays inert until the last one closes */
+let openModals = 0
+
+/** Makes the app (everything but the teleported modals) non-interactive */
+function setBackgroundInert(inert: boolean): void {
+    document.getElementById('app')?.toggleAttribute('inert', inert)
+}
+</script>
+
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, useId } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
@@ -37,7 +47,11 @@ function onKeyDown(event: KeyboardEvent): void {
         if (focusable.length === 0) return
         const first = focusable[0]!
         const last = focusable[focusable.length - 1]!
-        if (event.shiftKey && document.activeElement === first) {
+        if (!dialogRef.value.contains(document.activeElement)) {
+            // Focus got lost (e.g. click on the backdrop): bring it back into the dialog
+            event.preventDefault()
+            ;(event.shiftKey ? last : first).focus()
+        } else if (event.shiftKey && document.activeElement === first) {
             event.preventDefault()
             last.focus()
         } else if (!event.shiftKey && document.activeElement === last) {
@@ -61,6 +75,8 @@ onMounted(async () => {
     previouslyFocused = document.activeElement as HTMLElement | null
     previousBodyOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+    openModals++
+    setBackgroundInert(true)
     document.addEventListener('keydown', onKeyDown)
     await nextTick()
     closeButtonRef.value?.focus({ preventScroll: true })
@@ -74,6 +90,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
     document.body.style.overflow = previousBodyOverflow
+    openModals = Math.max(0, openModals - 1)
+    if (openModals === 0) setBackgroundInert(false)
     document.removeEventListener('keydown', onKeyDown)
     resizeObserver?.disconnect()
     if (previouslyFocused?.isConnected) {

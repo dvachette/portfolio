@@ -1,6 +1,6 @@
 <template>
+  <h1>Crédits</h1>
     <div class="credits">
-        <h1>Crédits</h1>
 
         <p>
             Ce portfolio a été développé par Donatien Vachette. Les projets présentés sont des

@@ -52,6 +52,8 @@ html {
 @media (max-width: 800px) {
     html {
         scroll-padding-top: 1rem;
+        /* Horizontal swipes change page (useSwipeNavigation): disable the browser history gesture */
+        overscroll-behavior-x: none;
     }
 }
 

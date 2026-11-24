@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { computed, ref, watch } from 'vue'
 import { useSkillsService } from '@/services/SkillsService'
 import { useProjectService } from '@/services/ProjectService'
@@ -15,7 +15,7 @@ import BaseModal from './BaseModal.vue'
 const base = import.meta.env.BASE_URL
 
 const router = useRouter()
-const route = useRoute()
+const props = defineProps<{ id: string }>()
 const ueService = useSkillsService()
 const projectService = useProjectService()
 
@@ -53,10 +53,8 @@ async function loadData(id: string): Promise<void> {
 }
 
 watch(
-    () => route.params.id,
-    (id) => {
-        if (typeof id === 'string') void loadData(id)
-    },
+    () => props.id,
+    (id) => void loadData(id),
     { immediate: true },
 )
 

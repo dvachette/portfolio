@@ -2,35 +2,14 @@
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import AppIcon from '@/components/AppIcon.vue'
-import type { IconName } from '@/types/IconName'
-
-type NavItem = {
-    name: 'home' | 'career' | 'interests' | 'competences' | 'projects' | 'contact' | 'credits'
-    label: string
-    icon: IconName
-    /** Position in the desktop bar */
-    order: number
-}
-
-// Primary items are always visible; secondary ones go into the "More" menu on mobile.
-const primaryItems: NavItem[] = [
-    { name: 'home', label: 'Accueil', icon: 'house', order: 1 },
-    { name: 'career', label: 'Parcours', icon: 'briefcase', order: 2 },
-    { name: 'competences', label: 'Compétences', icon: 'code-xml', order: 4 },
-    { name: 'projects', label: 'Projets', icon: 'folder-open', order: 5 },
-    { name: 'contact', label: 'Contact', icon: 'mail', order: 6 },
-]
-const secondaryItems: NavItem[] = [
-    { name: 'interests', label: "Centres d'intérêt", icon: 'heart', order: 3 },
-    { name: 'credits', label: 'Crédits', icon: 'book-open-text', order: 7 },
-]
+import { navItems, secondaryNavItems } from '@/router/navItems'
 
 const route = useRoute()
 const menuOpen = ref(false)
 const menuRef = ref<HTMLElement | null>(null)
 
 const secondaryActive = computed(() =>
-    secondaryItems.some((item) => route.matched.some((record) => record.name === item.name)),
+    secondaryNavItems.some((item) => route.matched.some((record) => record.name === item.name)),
 )
 
 function onPointerDown(event: PointerEvent): void {
@@ -72,7 +51,7 @@ onUnmounted(() => {
     <header>
         <nav aria-label="Navigation principale">
             <RouterLink
-                v-for="item in primaryItems"
+                v-for="item in navItems"
                 :key="item.name"
                 v-slot="{ href, navigate, isActive }"
                 :to="{ name: item.name }"
@@ -80,8 +59,10 @@ onUnmounted(() => {
             >
                 <a
                     :href="href"
-                    :class="['nav-link', { 'nav-link--active': isActive }]"
-                    :style="{ order: item.order }"
+                    :class="[
+                        'nav-link',
+                        { 'nav-link--active': isActive, 'nav-link--secondary': item.secondary },
+                    ]"
                     :aria-current="isActive ? 'page' : undefined"
                     @click="navigate"
                 >
@@ -90,10 +71,15 @@ onUnmounted(() => {
                 </a>
             </RouterLink>
 
+            <!-- Mobile only: secondary items are duplicated here, the bar copies are hidden -->
             <div ref="menuRef" class="nav-more">
                 <button
                     type="button"
-                    :class="['nav-link', 'nav-more__toggle', { 'nav-link--active': secondaryActive }]"
+                    :class="[
+                        'nav-link',
+                        'nav-more__toggle',
+                        { 'nav-link--active': secondaryActive },
+                    ]"
                     :aria-expanded="menuOpen"
                     aria-controls="nav-more-menu"
                     @click="menuOpen = !menuOpen"
@@ -106,7 +92,7 @@ onUnmounted(() => {
                     :class="['nav-more__menu', { 'nav-more__menu--open': menuOpen }]"
                 >
                     <RouterLink
-                        v-for="item in secondaryItems"
+                        v-for="item in secondaryNavItems"
                         :key="item.name"
                         v-slot="{ href, navigate, isActive }"
                         :to="{ name: item.name }"
@@ -115,7 +101,6 @@ onUnmounted(() => {
                         <a
                             :href="href"
                             :class="['nav-link', { 'nav-link--active': isActive }]"
-                            :style="{ order: item.order }"
                             :aria-current="isActive ? 'page' : undefined"
                             @click="navigate"
                         >
@@ -167,13 +152,8 @@ nav {
     text-decoration: underline;
 }
 
-/* Desktop: the "More" wrapper disappears and its links sit in the bar like the others */
-.nav-more,
-.nav-more__menu {
-    display: contents;
-}
-
-.nav-more__toggle {
+/* Desktop: secondary items are shown inline, the "More" menu is not needed */
+.nav-more {
     display: none;
 }
 
@@ -196,8 +176,11 @@ nav {
         gap: 0;
     }
 
+    .nav-link--secondary {
+        display: none;
+    }
+
     .nav-link {
-        order: 0 !important;
         flex: 1 1 0;
         min-width: 0;
         flex-direction: column;
@@ -235,10 +218,6 @@ nav {
         flex: 1 1 0;
         min-width: 0;
         position: relative;
-    }
-
-    .nav-more__toggle {
-        display: inline-flex;
     }
 
     .nav-more__menu {
