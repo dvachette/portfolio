@@ -1,3 +1,5 @@
+import { isObject } from '@/services/api'
+
 const API_URL = import.meta.env.VITE_API_URL
 
 export interface ContactPayload {
@@ -14,7 +16,11 @@ export async function sendContactForm(payload: ContactPayload): Promise<void> {
     })
 
     if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error ?? 'Unknown error')
+        const data: unknown = await response.json().catch(() => null)
+        const message =
+            isObject(data) && typeof data.error === 'string'
+                ? data.error
+                : "Le message n'a pas pu être envoyé. Réessayez plus tard."
+        throw new Error(message)
     }
 }

@@ -20,3 +20,9 @@ export interface SkillDetailModel {
     id: string
     name: string
 }
+
+export interface SkillSectionModel {
+    section: string
+    icon: string
+    skills: SkillModel[]
+}

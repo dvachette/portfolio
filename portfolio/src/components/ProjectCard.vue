@@ -19,13 +19,7 @@ const { project } = defineProps<{ project: ProjectModel }>()
                     :key="language"
                 />
             </div>
-            <p>
-                {{
-                    project.description.length > 100
-                        ? project.description.substring(0, 100) + '...'
-                        : project.description
-                }}
-            </p>
+            <p class="project_card__description">{{ project.description }}</p>
         </div>
         <div class="project_card__image">
             <img :src="`${base}images/projects/${project.image}`" :alt="project.title" loading="lazy" />
@@ -43,7 +37,6 @@ const { project } = defineProps<{ project: ProjectModel }>()
     color: inherit;
     text-decoration: none;
     background-color: #333c;
-    max-width: 500px;
     transition:
         transform 0.2s,
         background-color 0.2s;
@@ -66,6 +59,7 @@ div.project_card__text h2 {
     font-weight: bold;
 }
 .project_card__image {
+    flex: none;
     width: 150px;
     height: 150px;
     overflow: hidden;
@@ -75,6 +69,15 @@ div.project_card__text h2 {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+.project_card__description {
+    margin: 0;
+    /* Clean truncation on whole lines instead of cutting words */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
 }
 .languages {
     display: flex;
@@ -98,6 +101,7 @@ div.project_card__text h2 {
     .project_card__image {
         width: 100%;
         height: auto;
+        aspect-ratio: 16 / 9;
     }
 }
 </style>

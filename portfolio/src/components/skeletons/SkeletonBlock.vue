@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const { width = '100%', height, borderRadius } = defineProps<{
     width?: string
     height?: string
     borderRadius?: string

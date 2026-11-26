@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import type { SkillModel } from '@/models/SkillModel'
+import { computed } from 'vue'
 import CompetenceLevel from './CompetenceLevel.vue'
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL
 const { competence } = defineProps<{
     competence: SkillModel
 }>()
+const levelName = computed(
+    () => competence.levels.find((l) => l.level === competence.level)?.levelName ?? '',
+)
+const imageSrc = computed(() =>
+    competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`,
+)
 </script>
 <template>
     <RouterLink
@@ -13,22 +20,16 @@ const { competence } = defineProps<{
     >
         <div class="content_text">
             <div class="competence_card__header">
-                <CompetenceLevel 
-                    :level="competence.level" 
-                    :max="competence.levels.length" 
-                    :level_title="competence.levels.find((l) => l.level === competence.level)!.levelName"
+                <CompetenceLevel
+                    :level="competence.level"
+                    :max="competence.levels.length"
+                    :level_title="levelName"
                 />
                 <h3 class="competence_card__name">{{ competence.name }}</h3>
             </div>
-            <p class="competence_card__description">
-                {{
-                    competence.description.length > 100
-                        ? competence.description.substring(0, 100) + '...'
-                        : competence.description
-                }}
-            </p>            
+            <p class="competence_card__description">{{ competence.description }}</p>
         </div>
-        <img v-if="competence.image" :src="competence.image.startsWith('http') ? competence.image : `${base}assets/${competence.image}`" alt="" class="skill-img" loading="lazy" />
+        <img v-if="competence.image" :src="imageSrc" alt="" class="skill-img" loading="lazy" />
     </RouterLink>
 </template>
 <style scoped>
@@ -50,10 +51,14 @@ const { competence } = defineProps<{
         background-color 0.2s;
     max-width: 100%;
     display: flex;
+    align-items: center;
+    gap: 16px;
     color: inherit;
     text-decoration: none;
 }
-.contect_text {
+.content_text {
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -72,20 +77,22 @@ const { competence } = defineProps<{
     font-size: 1em;
     color: #aaa;
     margin-top: 10px;
+    margin-bottom: 0;
     font-weight: bold;
-} 
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+}
 .skill-img {
-    width: 100%;
-    margin-top: 10px;
+    flex: none;
+    width: min(40%, 160px);
+    margin-top: 20px;
     border-radius: 5px;
     /* make the image squared */
     aspect-ratio: 1 / 1;
     object-fit: contain;
-}
-.competence_card__description_area {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
 }
 /* Hover effect for pointer devices only (avoids sticky hover on touch) */
 @media (hover: hover) and (min-width: 600px) {
@@ -95,15 +102,16 @@ const { competence } = defineProps<{
         cursor: pointer;
     }
 }
-/* Fixed size and no hover effect for smaller screens */
 @media (max-width: 600px) {
     .competence_card {
-        width: 95%;
-        max-width: none;
+        width: 100%;
+        padding: 0 16px 16px;
     }
-    .competence_card:hover {
-        transform: none;
-        background-color: #333c;
+    .competence_card__name {
+        font-size: 1.3em;
+    }
+    .skill-img {
+        width: 88px;
     }
 }
 </style>

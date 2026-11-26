@@ -1,31 +1,38 @@
 <script setup lang="ts">
 import CompetenceCard from '@/components/CompetenceCard.vue'
-import type { SkillModel } from '@/models/SkillModel'
+import SkeletonBlock from '@/components/skeletons/SkeletonBlock.vue'
 import { useSkillsService } from '@/services/SkillsService'
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useAsyncData } from '@/composables/useAsyncData'
+import { computed, nextTick, onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue'
 
-const ueService = useSkillsService()
-const competences = ref<{ section: string, icon: string, skills: SkillModel[] }[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
-const activeSection = ref<string>('')
-let observer: IntersectionObserver
+const skillsService = useSkillsService()
+const { data, pending, error } = useAsyncData(skillsService.getSkillTab)
 
 function makeSlug(name: string): string {
     return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
 }
-const updateActive = (): void => {
-    const headings = Array.from(document.querySelectorAll('h2[id]'))
+
+const sections = computed(() =>
+    (data.value ?? []).map((section) => ({ ...section, slug: makeSlug(section.section) })),
+)
+
+const contentRef = useTemplateRef<HTMLElement>('content')
+const activeSection = shallowRef('')
+
+/** Highlights the section whose heading is closest to the top of the viewport */
+function updateActiveSection(): void {
+    const headings = Array.from(contentRef.value?.querySelectorAll<HTMLElement>('h2[id]') ?? [])
+    const last = headings[headings.length - 1]
+    if (!last) return
 
     const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 10
     if (isAtBottom) {
-        activeSection.value = headings[headings.length - 1]!.id
+        activeSection.value = last.id
         return
     }
 
-    let closest: string = ''
+    let closest = ''
     let closestDistance = Infinity
-
     for (const heading of headings) {
         const distance = Math.abs(heading.getBoundingClientRect().top - 120)
         if (distance < closestDistance) {
@@ -33,85 +40,46 @@ const updateActive = (): void => {
             closest = heading.id
         }
     }
-
-    if (closest) {
-        activeSection.value = closest
-    }
+    if (closest) activeSection.value = closest
 }
 
-onMounted(async function () {
-    try {
-        competences.value = await ueService.getSkillTab()
-        await nextTick()
-
-        const updateActive = (): void => {
-            const headings = Array.from(document.querySelectorAll('h2[id]')) as HTMLElement[]
-            const isAtBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 10
-            if (isAtBottom) {
-                activeSection.value = headings[headings.length - 1]!.id
-                return
-            }
-
-            let closest: string = ''
-            let closestDistance = Infinity
-
-            for (const heading of headings) {
-                const distance = Math.abs(heading.getBoundingClientRect().top - 120)
-                if (distance < closestDistance) {
-                    closestDistance = distance
-                    closest = heading.id
-                }
-            }
-
-            if (closest) {
-                activeSection.value = closest
-            }
-        }
-
-        observer = new IntersectionObserver(updateActive, {
-            threshold: Array.from({ length: 21 }, (_, i) => i * 0.05)
-        })
-
-        document.querySelectorAll('h2[id]').forEach(el => observer.observe(el))
-        window.addEventListener('scroll', updateActive, { passive: true })
-    } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
-    } finally {
-        loading.value = false
-    }
+watch(sections, async () => {
+    await nextTick()
+    updateActiveSection()
 })
 
-onUnmounted(() => {
-    observer?.disconnect()
-    window.removeEventListener('scroll', updateActive)
-})
-
-function scrollToSection(slug: string): void {
-    activeSection.value = slug
-}
+onMounted(() => window.addEventListener('scroll', updateActiveSection, { passive: true }))
+onUnmounted(() => window.removeEventListener('scroll', updateActiveSection))
 </script>
 
 <template>
     <div class="page">
-        <nav class="sections-nav">
+        <nav v-if="sections.length" class="sections-nav" aria-label="Sections">
             <a
-                v-for="section in competences"
-                :key="section.section"
-                :href="`#${makeSlug(section.section)}`"
-                :class="['sections-nav__item', { 'sections-nav__item--active': activeSection === makeSlug(section.section) }]"
+                v-for="section in sections"
+                :key="section.slug"
+                :href="`#${section.slug}`"
+                :class="[
+                    'sections-nav__item',
+                    { 'sections-nav__item--active': activeSection === section.slug },
+                ]"
+                :aria-current="activeSection === section.slug ? 'true' : undefined"
                 :title="section.section"
-                @click="scrollToSection(makeSlug(section.section))"
+                @click="activeSection = section.slug"
             >
                 <img :src="section.icon" :alt="section.section" />
             </a>
         </nav>
 
-        <div class="content">
+        <div ref="content" class="content">
             <h1>Compétences</h1>
-            <template v-for="section in competences" :key="section.section">
-                <h2 :id="makeSlug(section.section)">{{ section.section }}</h2>
-                <span v-if="error">{{ error }}</span>
-                <div v-else class="competences">
+            <p v-if="error" class="error" role="alert">{{ error }}</p>
+            <div v-else-if="pending" class="competences" aria-busy="true">
+                <SkeletonBlock v-for="n in 6" :key="n" height="12rem" border-radius="10px" />
+            </div>
+            <template v-for="section in sections" v-else :key="section.slug">
+                <h2 :id="section.slug">{{ section.section }}</h2>
+                <div class="competences">
                     <CompetenceCard
                         v-for="competence in section.skills"
                         :key="competence.id"
@@ -149,6 +117,12 @@ h2 {
     display: flex;
     flex-direction: row-reverse;
     gap: 1rem;
+}
+
+.error {
+    background-color: var(--color-surface);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
 }
 
 .content {

@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import CompetencesView from '@/views/CompetencesView.vue'
-import ProjectsView from '@/views/ProjectsView.vue'
-import ContactView from '@/views/ContactView.vue'
-import ProjectDetails from '@/components/ProjectDetail.vue'
-import CreditsView from '@/views/CreditsView.vue'
-import CompetenceDetail from '@/components/CompetenceDetail.vue'
-import CareerView from '@/views/CareerView.vue'
-import InterestsView from '@/views/InterestsView.vue'
+
+declare module 'vue-router' {
+    interface RouteMeta {
+        /** Page title, shown before the site name in the browser tab */
+        title?: string
+    }
+}
+
+const SITE_TITLE = 'Donatien Vachette – Développeur informatique - Lyon'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,12 +21,13 @@ const router = createRouter({
         {
             path: '/competences',
             name: 'competences',
-            component: CompetencesView,
+            component: () => import('@/views/CompetencesView.vue'),
+            meta: { title: 'Compétences' },
             children: [
                 {
                     path: ':id',
                     name: 'competence-details',
-                    component: CompetenceDetail,
+                    component: () => import('@/components/CompetenceDetail.vue'),
                     props: true,
                 },
             ],
@@ -33,12 +35,13 @@ const router = createRouter({
         {
             path: '/projects',
             name: 'projects',
-            component: ProjectsView,
+            component: () => import('@/views/ProjectsView.vue'),
+            meta: { title: 'Projets' },
             children: [
                 {
                     path: ':id',
                     name: 'project-details',
-                    component: ProjectDetails,
+                    component: () => import('@/components/ProjectDetail.vue'),
                     props: true,
                 },
             ],
@@ -46,29 +49,45 @@ const router = createRouter({
         {
             path: '/contact',
             name: 'contact',
-            component: ContactView,
+            component: () => import('@/views/ContactView.vue'),
+            meta: { title: 'Contact' },
         },
         {
             path: '/credits',
             name: 'credits',
-            component: CreditsView,
+            component: () => import('@/views/CreditsView.vue'),
+            meta: { title: 'Crédits' },
         },
         {
             path: '/parcours',
             name: 'career',
-            component: CareerView,
+            component: () => import('@/views/CareerView.vue'),
+            meta: { title: 'Parcours' },
         },
         {
             path: '/interets',
             name: 'interests',
-            component: InterestsView,
+            component: () => import('@/views/InterestsView.vue'),
+            meta: { title: "Centres d'intérêt" },
         },
         {
             // Legacy "about me" page
             path: '/me',
             redirect: { name: 'career' },
         },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'not-found',
+            component: () => import('@/views/NotFoundView.vue'),
+            meta: { title: 'Page introuvable' },
+        },
     ],
+})
+
+router.afterEach((to) => {
+    // Child routes (detail modals) inherit the title of their parent page
+    const title = [...to.matched].reverse().find((record) => record.meta.title)?.meta.title
+    document.title = title ? `${title} | ${SITE_TITLE}` : SITE_TITLE
 })
 
 export default router

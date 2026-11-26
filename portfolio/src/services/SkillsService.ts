@@ -1,26 +1,19 @@
-import type { SkillModel } from '@/models/SkillModel'
-import { getCache, setCache } from '@/composables/useCache'
+import type { SkillModel, SkillSectionModel } from '@/models/SkillModel'
+import { apiGet, hasKeys, isArrayOf } from '@/services/api'
 
-const API_URL = import.meta.env.VITE_API_URL
+const isSkill = hasKeys<SkillModel>('id', 'name', 'level', 'levels')
+const isSkillSectionList = isArrayOf(hasKeys<SkillSectionModel>('section', 'icon', 'skills'))
 
-export async function getSkillTab(): Promise<{ section: string, icon: string, skills: SkillModel[] }[]> {
-    const cached = getCache<{ section: string, icon: string, skills: SkillModel[] }[]>('skills')
-    if (cached) return cached
-    const res = await fetch(`${API_URL}/skills`)
-    if (!res.ok) throw new Error('Erreur lors du chargement des compétences')
-    const data = await res.json()
-    setCache('skills', data)
-    return data
+export function getSkillTab(): Promise<SkillSectionModel[]> {
+    return apiGet('/skills', 'Erreur lors du chargement des compétences', isSkillSectionList)
 }
 
-export async function getSkillById(id: string): Promise<SkillModel> {
-    const cached = getCache<SkillModel>(`skills:${id}`)
-    if (cached) return cached
-    const res = await fetch(`${API_URL}/skills/${id}`)
-    if (!res.ok) throw new Error(`Erreur lors du chargement de la compétence ${id}`)
-    const data = await res.json()
-    setCache(`skills:${id}`, data)
-    return data
+export function getSkillById(id: string): Promise<SkillModel> {
+    return apiGet(
+        `/skills/${encodeURIComponent(id)}`,
+        `Erreur lors du chargement de la compétence ${id}`,
+        isSkill,
+    )
 }
 
 export function useSkillsService() {

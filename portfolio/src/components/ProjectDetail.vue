@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { ProjectModel } from '@/models/ProjectModel'
 import LanguageTag from './LanguageTag.vue'
 import ProjectCompetenceCard from './ProjectCompetenceCard.vue'
 import { useRouter } from 'vue-router'
 import { useProjectService } from '@/services/ProjectService'
-import { ref, watch } from 'vue'
+import { useAsyncData } from '@/composables/useAsyncData'
 import ProjectTypeLabel from './ProjectTypeLabel.vue'
 import SkeletonProjectDetail from './skeletons/SkeletonProjectDetail.vue'
 import BaseModal from './BaseModal.vue'
@@ -12,29 +11,11 @@ import BaseModal from './BaseModal.vue'
 const router = useRouter()
 const props = defineProps<{ id: string }>()
 const projectService = useProjectService()
-const project = ref<ProjectModel | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
-const base = import.meta.env.BASE_URL
-
-async function loadData(id: string): Promise<void> {
-    loading.value = true
-    error.value = null
-    project.value = null
-    try {
-        project.value = await projectService.getProjectById(id)
-    } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
-    } finally {
-        loading.value = false
-    }
-}
-
-watch(
-    () => props.id,
-    (id) => void loadData(id),
-    { immediate: true },
+const { data: project, pending: loading, error } = useAsyncData(
+    () => projectService.getProjectById(props.id),
+    { watch: () => props.id },
 )
+const base = import.meta.env.BASE_URL
 
 function onClosed(): void {
     void router.push({ name: 'projects' })
@@ -49,7 +30,7 @@ function onClosed(): void {
             </template>
         </template>
 
-        <p v-if="error" class="project_detail__error">{{ error }}</p>
+        <p v-if="error" class="project_detail__error" role="alert">{{ error }}</p>
         <template v-else-if="project">
             <div class="project_detail__content">
                 <div class="project_detail_content__text">

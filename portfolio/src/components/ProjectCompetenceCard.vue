@@ -14,7 +14,7 @@ const { competence } = defineProps<{ competence: SkillModel }>()
             <CompetenceLevel
                 :level="competence.level" 
                 :max="competence.levels.length" 
-                :level_title="competence.levels.find((l) => l.level === competence.level)!.levelName"
+                :level_title="competence.levels.find((l) => l.level === competence.level)?.levelName ?? ''"
             />
             <h3 class="competence_card__name">{{ competence.name }}</h3>
         </div>

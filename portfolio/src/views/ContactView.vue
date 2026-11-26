@@ -4,33 +4,33 @@
             <h1>Me contacter</h1>
 
             <div class="contact__links">
-                <a class="btn" target="blank" href="https://www.linkedin.com/in/donatien-vachette/">Mon LinkedIn</a>
-                <a class="btn" target="blank" href="https://www.github.com/dvachette">Mon GitHub</a>
-                <a class="btn" target="_blank" href="/cv_donatien_vachette-latest.pdf">Mon CV</a>
+                <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/donatien-vachette/">Mon LinkedIn</a>
+                <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.github.com/dvachette">Mon GitHub</a>
+                <a class="btn" target="_blank" rel="noopener" href="/cv_donatien_vachette-latest.pdf">Mon CV</a>
             </div>
 
             <div class="contact__divider" />
 
-            <h2>Me contacter</h2>
+            <h2>Envoyer un message</h2>
 
-            <div v-if="status === 'success'" class="contact__feedback contact__feedback--success">
+            <div v-if="status === 'success'" class="contact__feedback contact__feedback--success" role="status">
                 Message envoyé avec succès !
             </div>
-            <div v-else-if="status === 'error'" class="contact__feedback contact__feedback--error">
+            <div v-else-if="status === 'error'" class="contact__feedback contact__feedback--error" role="alert">
                 {{ errorMessage }}
             </div>
             <form v-if="status !== 'success'" class="contact__form" @submit.prevent="handleSubmit">
                 <div class="contact__field">
                     <label for="name">Nom</label>
-                    <input id="name" v-model="form.name" type="text" placeholder="Votre nom" :disabled="status === 'loading'" />
+                    <input id="name" v-model="form.name" type="text" autocomplete="name" required placeholder="Votre nom" :disabled="status === 'loading'" />
                 </div>
                 <div class="contact__field">
                     <label for="email">Email</label>
-                    <input id="email" v-model="form.email" type="email" placeholder="Votre email" :disabled="status === 'loading'" />
+                    <input id="email" v-model="form.email" type="email" autocomplete="email" required placeholder="Votre email" :disabled="status === 'loading'" />
                 </div>
                 <div class="contact__field">
                     <label for="message">Message</label>
-                    <textarea id="message" v-model="form.message" placeholder="Votre message" rows="5" :disabled="status === 'loading'" />
+                    <textarea id="message" v-model="form.message" required placeholder="Votre message" rows="5" :disabled="status === 'loading'" />
                 </div>
                 <button class="btn btn--submit" type="submit" :disabled="status === 'loading'">
                     {{ status === 'loading' ? 'Envoi en cours...' : 'Envoyer' }}
@@ -154,6 +154,17 @@ async function handleSubmit(): Promise<void> {
     font-family: inherit;
     transition: border-color 0.3s ease;
     resize: vertical;
+}
+@media (max-width: 600px) {
+    .contact {
+        padding: 0;
+    }
+    .contact__block {
+        padding: 1.25em;
+    }
+    .contact h1 {
+        font-size: 2em;
+    }
 }
 .contact__field input:focus,
 .contact__field textarea:focus {

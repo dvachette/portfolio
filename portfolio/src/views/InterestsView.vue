@@ -1,29 +1,16 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import SkeletonBlock from '@/components/skeletons/SkeletonBlock.vue'
-import type { InterestModel } from '@/models/InterestModel'
 import { useInterestService } from '@/services/InterestService'
+import { useAsyncData } from '@/composables/useAsyncData'
 
 const interestService = useInterestService()
-const interests = ref<InterestModel[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
-
-onMounted(async function () {
-    try {
-        interests.value = await interestService.getInterests()
-    } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
-    } finally {
-        loading.value = false
-    }
-})
+const { data: interests, pending: loading, error } = useAsyncData(interestService.getInterests)
 </script>
 
 <template>
     <div class="interests">
         <h1>Centres d'intérêt</h1>
-        <p v-if="error" class="error">{{ error }}</p>
+        <p v-if="error" class="error" role="alert">{{ error }}</p>
         <div v-else class="grid">
             <template v-if="loading">
                 <SkeletonBlock

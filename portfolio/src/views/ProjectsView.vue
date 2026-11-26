@@ -1,53 +1,38 @@
 <script setup lang="ts">
 import { useProjectService } from '@/services/ProjectService'
-import { ref, onMounted } from 'vue'
-import type { ProjectModel } from '@/models/ProjectModel'
+import { useAsyncData } from '@/composables/useAsyncData'
 import ProjectCard from '@/components/ProjectCard.vue'
+import SkeletonBlock from '@/components/skeletons/SkeletonBlock.vue'
 
 const projectService = useProjectService()
-const projects = ref<ProjectModel[]>([])
-const loading = ref(true)
-const error = ref<string | null>(null)
-
-onMounted(async function() {
-    try {
-        projects.value = await projectService.getProjectTab()
-    } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
-    } finally {
-        loading.value = false
-    }
-})
+const { data: projects, pending, error } = useAsyncData(projectService.getProjectTab)
 </script>
 <template>
-    <h1>Mes projets</h1>
-    <span v-if="error">{{ error }}</span>
-    <div v-else class="projects-list">
-        <ProjectCard
-            v-for="project in projects"
-            :key="project.id"
-            :project="project"
-        />
+    <h1 class="projects-title">Mes projets</h1>
+    <p v-if="error" class="projects-error" role="alert">{{ error }}</p>
+    <div v-else class="projects-list" :aria-busy="pending">
+        <template v-if="pending">
+            <SkeletonBlock v-for="n in 4" :key="n" height="182px" border-radius="8px" />
+        </template>
+        <ProjectCard v-for="project in projects" v-else :key="project.id" :project="project" />
     </div>
     <RouterView />
 </template>
 <style scoped>
 .projects-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
     gap: 1em;
 }
-h1 {
+.projects-title {
     font-size: 2.5em;
     color: #eee;
     font-weight: bold;
     cursor: default;
 }
-@media (max-width: 600px) {
-    .projects-list {
-        flex-direction: column;
-        align-items: center;
-    }
+.projects-error {
+    background-color: var(--color-surface);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
 }
 </style>

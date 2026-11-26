@@ -1,8 +1,17 @@
 <script setup lang="ts">
 import HeaderComponent from '@/components/HeaderComponent.vue'
-import FloatingLines from '@/components/FloatingLines/FloatingLines.vue'
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { useSwipeNavigation } from '@/composables/useSwipeNavigation'
+import { useMediaQuery } from '@/composables/useMediaQuery'
+
+// The animated WebGL background (three.js) is heavy: load it in its own chunk, and only
+// where it is shown. Small screens and reduced-motion users get a static gradient instead.
+const FloatingLines = defineAsyncComponent(
+    () => import('@/components/FloatingLines/FloatingLines.vue'),
+)
+const showAnimatedBackground = useMediaQuery(
+    '(min-width: 601px) and (prefers-reduced-motion: no-preference)',
+)
 
 const { direction } = useSwipeNavigation()
 // Pages only slide when the navigation comes from a swipe
@@ -23,6 +32,7 @@ function onPageEntered(): void {
     <HeaderComponent />
     <main>
         <FloatingLines
+            v-if="showAnimatedBackground"
             :enabled-waves="['top', 'middle', 'bottom']"
             :line-count="[10, 15, 20]"
             :line-distance="[8, 6, 4]"
@@ -32,6 +42,7 @@ function onPageEntered(): void {
             :parallax="true"
             id="lines"
         />
+        <div v-else class="static-bg" />
         <RouterView v-slot="{ Component, route }">
             <Transition
                 :name="transitionName"
@@ -45,7 +56,6 @@ function onPageEntered(): void {
                 </div>
             </Transition>
         </RouterView>
-        <div class="mobile-bg" />
     </main>
 </template>
 
@@ -84,8 +94,12 @@ main {
     height: 100%;
     z-index: -1;
 }
-.mobile-bg {
-    display: none;
+.static-bg {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom, #8905a3, #0057da);
+    z-index: -1;
+    pointer-events: none;
 }
 
 @media (max-width: 800px) {
@@ -93,24 +107,6 @@ main {
         padding-bottom: calc(
             var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--page-padding)
         );
-    }
-}
-
-@media (max-width: 600px) {
-    .mobile-bg {
-        display: block;
-        position: fixed;
-        inset: 0;
-        background: linear-gradient(to bottom, #8905a3, #0057da);
-        z-index: -1;
-        pointer-events: none;
-    }
-
-    main {
-        background: transparent;
-    }
-    #lines {
-        display: none;
     }
 }
 </style>

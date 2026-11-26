@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import TimelineEntry from '@/components/TimelineEntry.vue'
 import SkeletonBlock from '@/components/skeletons/SkeletonBlock.vue'
-import type { CareerModel } from '@/models/CareerModel'
 import { useCareerService } from '@/services/CareerService'
+import { useAsyncData } from '@/composables/useAsyncData'
 import { workloadLabels } from '@/types/ExperienceType'
 
 const base = import.meta.env.BASE_URL
 const careerService = useCareerService()
-const career = ref<CareerModel | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
+const { data: career, pending: loading, error } = useAsyncData(careerService.getCareer)
 
 const professional = computed(
     () => career.value?.experiences.filter((e) => e.type !== 'association') ?? [],
@@ -18,16 +16,6 @@ const professional = computed(
 const associative = computed(
     () => career.value?.experiences.filter((e) => e.type === 'association') ?? [],
 )
-
-onMounted(async function () {
-    try {
-        career.value = await careerService.getCareer()
-    } catch (e) {
-        error.value = e instanceof Error ? e.message : 'Erreur de chargement'
-    } finally {
-        loading.value = false
-    }
-})
 </script>
 
 <template>
@@ -67,7 +55,7 @@ onMounted(async function () {
             </aside>
 
             <div class="sections">
-                <p v-if="error" class="error">{{ error }}</p>
+                <p v-if="error" class="error" role="alert">{{ error }}</p>
 
                 <template v-else-if="loading">
                     <SkeletonBlock

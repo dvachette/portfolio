@@ -1,16 +1,10 @@
 import type { InterestModel } from '@/models/InterestModel'
-import { getCache, setCache } from '@/composables/useCache'
+import { apiGet, hasKeys, isArrayOf } from '@/services/api'
 
-const API_URL = import.meta.env.VITE_API_URL
+const isInterestList = isArrayOf(hasKeys<InterestModel>('id', 'title', 'description', 'tags'))
 
-export async function getInterests(): Promise<InterestModel[]> {
-    const cached = getCache<InterestModel[]>('interests')
-    if (cached) return cached
-    const res = await fetch(`${API_URL}/interests`)
-    if (!res.ok) throw new Error('Erreur lors du chargement des centres d’intérêt')
-    const data = await res.json()
-    setCache('interests', data)
-    return data
+export function getInterests(): Promise<InterestModel[]> {
+    return apiGet('/interests', 'Erreur lors du chargement des centres d’intérêt', isInterestList)
 }
 
 export function useInterestService() {

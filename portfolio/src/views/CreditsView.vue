@@ -1,5 +1,5 @@
 <template>
-  <h1>Crédits</h1>
+    <h1 class="credits-title">Crédits</h1>
     <div class="credits">
 
         <p>
@@ -10,16 +10,16 @@
         <p>
             Les images utilisées dans ce portfolio sont des captures d'écran des projets réalisés.
             Les icônes viennent de bibliothèques d'icônes gratuites comme
-            <a target="blank" href="https://https://www.flaticon.com">Flaticon</a>.
+            <a target="_blank" rel="noopener noreferrer" href="https://www.flaticon.com">Flaticon</a>.
         </p>
         <p>
             Les technologies utilisées pour développer ce portfolio incluent
-            <a target="blank" href="https://vuejs.org/">Vue.js</a>,
-            <a target="blank" href="https://www.typescriptlang.org/">TypeScript</a>,
-            <a target="blank" href="https://httpd.apache.org/">Apache HTTP Server</a>,
-            <a target="blank" href="https://www.docker.com/">Docker</a>, et diverses bibliothèques
+            <a target="_blank" rel="noopener noreferrer" href="https://vuejs.org/">Vue.js</a>,
+            <a target="_blank" rel="noopener noreferrer" href="https://www.typescriptlang.org/">TypeScript</a>,
+            <a target="_blank" rel="noopener noreferrer" href="https://httpd.apache.org/">Apache HTTP Server</a>,
+            <a target="_blank" rel="noopener noreferrer" href="https://www.docker.com/">Docker</a>, et diverses bibliothèques
             pour les animations et les effets visuels, comme
-            <a target="blank" href="https://vue-bits.dev/">Vue Bits</a>.
+            <a target="_blank" rel="noopener noreferrer" href="https://vue-bits.dev/">Vue Bits</a>.
         </p>
         <p>
             Si vous avez des questions ou souhaitez en savoir plus sur les projets présentés,
@@ -53,6 +53,9 @@
                 <a href="https://www.flaticon.com/free-icons/code" title="code icons">Code icons created by juicy_fish - Flaticon</a>
             </li>
             <li>
+                <a href="https://lucide.dev" title="Lucide icons">Navigation icons by Lucide (ISC license)</a>
+            </li>
+            <li>
                 <a
                     href="https://vue-bits.dev/backgrounds/floating-lines"
                     title="Floating Lines Background"
@@ -66,24 +69,15 @@
 .credits {
     display: flex;
     flex-direction: column;
-    padding: 2em;
     align-items: center;
+    box-sizing: border-box;
+    width: min(100%, 900px);
+    margin: 0 auto;
+    padding: 1em 2em;
     background-color: #333c;
-    padding: 1em;
     border-radius: 8px;
-    width: 70%;
-    position: absolute;
-    overflow: scroll;
-    scrollbar-width: none; /* Firefox */
-    height: 70vh;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
 }
-.credits::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-}
-h1 {
+.credits-title {
     font-size: 2.5em;
     font-weight: bold;
     color: #eee;
@@ -96,6 +90,7 @@ h1 {
     text-align: justify;
 }
 .credits a {
+    overflow-wrap: anywhere;
     color: #ddd;
     text-decoration: none;
     font-weight: bold;
@@ -111,14 +106,12 @@ h1 {
 .credits li {
     margin: 0.5em 0;
 }
-@media (max-width: 800px) {
+@media (max-width: 600px) {
     .credits {
-        width: 90%;
-        position: absolute;
-        top: 55%;
-        height: 80vh;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        padding: 0.5em 1em;
+    }
+    .credits p {
+        font-size: 1.1em;
     }
 }
 </style>

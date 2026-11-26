@@ -44,9 +44,13 @@ p {
 }
 
 @media (max-width: 600px) {
+    .home h1 {
+        font-size: 2em;
+    }
     p {
-        width: 80%;
-        font-size: 1.4em;
+        width: 100%;
+        font-size: 1.1em;
+        line-height: 1.5;
     }
 }
 </style>
